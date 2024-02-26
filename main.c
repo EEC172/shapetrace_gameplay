@@ -84,7 +84,7 @@
 
 #define APPLICATION_NAME        "SSL"
 #define APPLICATION_VERSION     "1.1.1.EEC.Spring2018"
-#define SERVER_NAME             "avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com/things/gb_mr_CC3200/shadow"
+#define SERVER_NAME             "avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com"
 #define GOOGLE_DST_PORT         8443
 
 #define SL_SSL_CA_CERT "/cert/rootCA.der" //starfield class2 rootca (from firefox) // <-- this one works
@@ -93,11 +93,11 @@
 
 
 //NEED TO UPDATE THIS FOR IT TO WORK!
-#define DATE                22    /* Current Date */
+#define DATE                25    /* Current Date */
 #define MONTH               2     /* Month 1-12 */
 #define YEAR                2024  /* Current year */
-#define HOUR                10    /* Time - hours */
-#define MINUTE              38    /* Time - minutes */
+#define HOUR                21    /* Time - hours */
+#define MINUTE              43    /* Time - minutes */
 #define SECOND              0     /* Time - seconds */
 
 #define POSTHEADER "POST /things/gb_mr_CC3200/shadow HTTP/1.1\n\r"
@@ -954,6 +954,7 @@ static int http_post(int iTLSSockID){
     // Send the packet to the server */
     //
     lRetVal = sl_Send(iTLSSockID, acSendBuff, strlen(acSendBuff), 0);
+    UART_PRINT("lRetVal = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("POST failed. Error Number: %i\n\r",lRetVal);
         sl_Close(iTLSSockID);
@@ -961,6 +962,7 @@ static int http_post(int iTLSSockID){
         return lRetVal;
     }
     lRetVal = sl_Recv(iTLSSockID, &acRecvbuff[0], sizeof(acRecvbuff), 0);
+    UART_PRINT("lRetVal = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("Received failed. Error Number: %i\n\r",lRetVal);
         //sl_Close(iSSLSockID);
@@ -975,3 +977,7 @@ static int http_post(int iTLSSockID){
 
     return 0;
 }
+//
+//static int http_get(int iTLSSockID) {
+//
+//}

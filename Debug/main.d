@@ -36,7 +36,7 @@ main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/driverlib/utils.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/driverlib/uart.h
 main.obj: ../pinmux.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.h
-main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/common.h
+main.obj: ../common.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if.h
 
 ../main.c:
@@ -111,7 +111,7 @@ main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if
 
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.h:
 
-/Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/common.h:
+../common.h:
 
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if.h:
 
