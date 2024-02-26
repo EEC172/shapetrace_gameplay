@@ -96,13 +96,13 @@
 #define DATE                25    /* Current Date */
 #define MONTH               2     /* Month 1-12 */
 #define YEAR                2024  /* Current year */
-#define HOUR                21    /* Time - hours */
-#define MINUTE              43    /* Time - minutes */
+#define HOUR                23    /* Time - hours */
+#define MINUTE              06    /* Time - minutes */
 #define SECOND              0     /* Time - seconds */
 
-#define POSTHEADER "POST /things/gb_mr_CC3200/shadow HTTP/1.1\n\r"
-#define GETHEADER "GET /things/gb_mr_CC3200/shadow HTTP/1.1\n\r"
-#define HOSTHEADER "Host: avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com \r\n"
+#define POSTHEADER "POST /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
+#define GETHEADER "GET /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
+#define HOSTHEADER "Host: avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com\r\n"
 #define CHEADER "Connection: Keep-Alive\r\n"
 #define CTHEADER "Content-Type: application/json; charset=utf-8\r\n"
 #define CLHEADER1 "Content-Length: "
@@ -901,6 +901,7 @@ void main() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal);
+    http_get(lRetVal);
 
     sl_Stop(SL_STOP_TIMEOUT);
     LOOP_FOREVER();
@@ -977,7 +978,44 @@ static int http_post(int iTLSSockID){
 
     return 0;
 }
-//
-//static int http_get(int iTLSSockID) {
-//
-//}
+
+static int http_get(int iTLSSockID) {
+    char acSendBuff[512];
+    char acRecvbuff[1460];
+    char cCLLength[200];
+    char* pcBufHeaders;
+    int lRetVal = 0;
+
+    pcBufHeaders = acSendBuff;
+    strcpy(pcBufHeaders, GETHEADER);
+    pcBufHeaders += strlen(GETHEADER);
+    strcpy(pcBufHeaders, HOSTHEADER);
+    pcBufHeaders += strlen(HOSTHEADER);
+    strcpy(pcBufHeaders, CHEADER);
+    pcBufHeaders += strlen(CHEADER);
+    strcpy(pcBufHeaders, "\r\n\r\n");
+
+    UART_PRINT(acSendBuff);
+
+    lRetVal = sl_Send(iTLSSockID, acSendBuff, strlen(acSendBuff), 0);
+    UART_PRINT("lRetVal = %i\n\r", lRetVal);
+    if(lRetVal < 0) {
+        UART_PRINT("POST failed. Error Number: %i\n\r",lRetVal);
+        sl_Close(iTLSSockID);
+        GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+        return lRetVal;
+    }
+    lRetVal = sl_Recv(iTLSSockID, &acRecvbuff[0], sizeof(acRecvbuff), 0);
+    UART_PRINT("lRetVal = %i\n\r", lRetVal);
+    if(lRetVal < 0) {
+        UART_PRINT("Received failed. Error Number: %i\n\r",lRetVal);
+        //sl_Close(iSSLSockID);
+        GPIO_IF_LedOn(MCU_RED_LED_GPIO);
+           return lRetVal;
+    }
+    else {
+        acRecvbuff[lRetVal+1] = '\0';
+        UART_PRINT(acRecvbuff);
+        UART_PRINT("\n\r\n\r");
+    }
+}
