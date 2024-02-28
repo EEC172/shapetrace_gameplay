@@ -67,6 +67,7 @@ extern "C"
 #define BSSID_LEN_MAX       6
 
 
+
 #ifdef NOTERM
 #define UART_PRINT(x,...)
 #define DBG_PRINT(x,...)

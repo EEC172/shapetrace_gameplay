@@ -58,6 +58,10 @@
 //*****************************************************************************
 
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include <time.h>
 
 // Simplelink includes
 #include "simplelink.h"
@@ -71,9 +75,25 @@
 #include "prcm.h"
 #include "utils.h"
 #include "uart.h"
+#include "spi.h"
+#include "hw_nvic.h"
+#include "hw_memmap.h"
+#include "hw_common_reg.h"
+#include "interrupt.h"
+#include "hw_apps_rcm.h"
+#include "glcdfont.h"
+#include "rom.h"
+#include "rom_map.h"
+#include "prcm.h"
+#include "gpio.h"
+#include "utils.h"
+#include "systick.h"
+#include "Adafruit_GFX.h"
+#include "Adafruit_SSD1351.h"
+#include "uart.h"
 
 //Common interface includes
-#include "pinmux.h"
+//#include "pinmux.h"
 #include "gpio_if.h"
 #include "common.h"
 #include "uart_if.h"
@@ -108,8 +128,7 @@
 #define CLHEADER1 "Content-Length: "
 #define CLHEADER2 "\r\n\r\n"
 
-#define DATA1 "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"Hello phone, message from CC3200 via AWS IoT!\"\r\n}}}\r\n\r\n"
-
+#define DATA1 "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"This message is to our email!\"\r\n}}}\r\n\r\n"
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
@@ -152,6 +171,92 @@ extern void (* const g_pfnVectors[])(void);
 #if defined(ewarm)
 extern uVectorEntry __vector_table;
 #endif
+
+// some helpful macros for systick
+
+// the cc3200's fixed clock frequency of 80 MHz
+// note the use of ULL to indicate an unsigned long long constant
+#define SYSCLKFREQ 80000000ULL
+
+// macro to convert ticks to microseconds
+#define TICKS_TO_US(ticks) \
+    ((((ticks) / SYSCLKFREQ) * 1000000ULL) + \
+    ((((ticks) % SYSCLKFREQ) * 1000000ULL) / SYSCLKFREQ))\
+
+// macro to convert microseconds to ticks
+#define US_TO_TICKS(us) ((SYSCLKFREQ / 1000000ULL) * (us))
+
+// systick reload value set to 40ms period
+// (PERIOD_SEC) * (SYSCLKFREQ) = PERIOD_TICKS
+#define SYSTICK_RELOAD_VAL 3200000UL
+
+volatile uint64_t delta; volatile double delta_ms;
+
+// track systick counter periods elapsed
+// if it is not 0, we know the transmission ended
+volatile int systick_cnt = 0;
+
+extern void (* const g_pfnVectors[])(void);
+
+volatile unsigned long IR_intcount;
+volatile unsigned char IR_intflag;
+
+
+uint64_t systick_get[33];
+double systick_get_ms[33];
+char start_and_address[17]; char data[16];
+int letter_count = 0;
+char text[64];
+int pressed_button = 0; int prev = -1; int same_button_counter = 0;
+time_t prev_button_pressed_time;
+time_t uart_handler_time;
+double interval;
+int globalX = 0; int globalY = 70;
+char dad[64];
+
+
+#define START_ADDRESS "20001000000010000"
+
+#define ARRAY_0 "1001000001101111"
+#define ARRAY_1 "0000000011111111"
+#define ARRAY_2 "1000000001111111"
+#define ARRAY_3 "0100000010111111"
+#define ARRAY_4 "1100000000111111"
+#define ARRAY_5 "0010000011011111"
+#define ARRAY_6 "1010000001011111"
+#define ARRAY_7 "0110000010011111"
+#define ARRAY_8 "1110000000011111"
+#define ARRAY_9 "0001000011101111"
+#define ARRAY_LAST "1011100001000111"
+#define ARRAY_MUTE "0010100011010111"
+
+#define INITIAL 0
+#define ADDRESS_PROCESSING 1
+#define DATA_PROCESSING 17
+volatile int state;
+
+#define BLACK           0x0000
+#define BLUE            0x001F
+#define GREEN           0x07E0
+#define CYAN            0x07FF
+#define RED             0xF800
+#define MAGENTA         0xF81F
+#define YELLOW          0xFFE0
+#define WHITE           0xFFFF
+
+#define HORIZONTAL      0
+#define VERTICAL        1
+
+#define SPI_IF_BIT_RATE  100000
+
+#define BOARD_TO_BOARD         UARTA1_BASE
+#define BOARD_TO_BOARD_PERIPH  PRCM_UARTA1
+unsigned char ucCharBuffer[64];
+uint16_t ui16CharCounter = 0;
+int uart_int_count = 0;
+int UART_RX_intflag = 0;
+
+static unsigned long __Errorlog;
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End: df
 //*****************************************************************************
@@ -865,6 +970,465 @@ int connectToAccessPoint() {
     return 0;
 }
 
+/*****************************************************************************/
+/**
+ * Reset SysTick Counter
+ */
+static inline void SysTickReset(void) {
+    // any write to the ST_CURRENT register clears it
+    // after clearing it automatically gets reset without
+    // triggering exception logic
+    // see reference manual section 3.2.1
+    HWREG(NVIC_ST_CURRENT) = 1;
+
+    // clear the global count variable
+    systick_cnt = 0;
+
+    MAP_SysTickPeriodSet(SYSTICK_RELOAD_VAL);
+}
+
+/**
+ * SysTick Interrupt Handler
+ *
+ * Keep track of whether the systick counter wrapped
+ */
+static void SysTickHandler(void) {
+    // increment every time the systick handler fires
+    systick_cnt++;
+}
+
+void ClearArrays(void) {
+    if (IR_intcount >= 33) {
+        memset(systick_get, 0, sizeof(systick_get));
+        memset(systick_get_ms, 0, sizeof(systick_get_ms));
+        memset(start_and_address, 0, sizeof(start_and_address));
+        memset(data, 0, sizeof(data));
+    }
+}
+
+bool ConfirmStartAndAddress() { return (strcmp(start_and_address, START_ADDRESS) == 0); }
+
+//IR_intflag = 0;
+void InitialState() {
+    IR_intcount = 0; IR_intflag = 0;
+    if ((delta >= 690000) && (delta <= 730000)) { //range of values for approx 9 ms
+        systick_get[IR_intcount] = delta;
+        systick_get_ms[IR_intcount] = delta_ms;
+        start_and_address[IR_intcount] = '2';
+        state = ADDRESS_PROCESSING;
+    }
+ }
+
+void AddressProcessingState() {
+    IR_intcount++;
+    //address reading
+    if ((delta <= 93000) && (delta >= 80000)) {
+        systick_get[IR_intcount] = delta;
+        systick_get_ms[IR_intcount] = delta_ms;
+        start_and_address[IR_intcount] = '0';
+    } else if ((delta >= 165000) && (delta <= 195000)) {
+        systick_get[IR_intcount] = delta;
+        systick_get_ms[IR_intcount] = delta_ms;
+        start_and_address[IR_intcount] = '1';
+    } else {
+        IR_intcount = 0; ClearArrays(); state = INITIAL;
+        return;
+    }
+    //end of address reading. State will change at IR_intcount = 16
+    if (IR_intcount == 16) {
+        //mismatch addresses
+        if (!ConfirmStartAndAddress()) {
+            IR_intcount = 0; ClearArrays(); state = INITIAL;
+            return;
+        } else {
+            state = DATA_PROCESSING;
+            return;
+        }
+    }
+}
+
+void DataProcessingState() {
+    IR_intcount++;
+    //data reading
+    if ((delta <= 93000) && (delta >= 80000)) {
+        systick_get[IR_intcount] = delta;
+        systick_get_ms[IR_intcount] = delta_ms;
+        data[IR_intcount-17] = '0';
+    } else if ((delta >= 165000) && (delta <= 195000)) {
+        systick_get[IR_intcount] = delta;
+        systick_get_ms[IR_intcount] = delta_ms;
+        data[IR_intcount-17] = '1';
+    } else {
+        IR_intcount = 0; ClearArrays(); state = INITIAL;
+        return;
+    }
+    //end of data reading
+    if (IR_intcount == 32) {
+        IR_intcount = 0; IR_intflag = 1; state = INITIAL;
+        return;
+    }
+}
+
+static void GPIOA3IntHandler(void) { // IR handler
+    unsigned long ulStatus;
+    ulStatus = MAP_GPIOIntStatus (GPIOA3_BASE, true);
+    MAP_GPIOIntClear(GPIOA3_BASE, ulStatus);        // clear interrupts on GPIOA3
+    delta = SYSTICK_RELOAD_VAL - SysTickValueGet();
+    delta_ms = (double)TICKS_TO_US(delta)/1000;
+    switch (state) {
+            case INITIAL:
+                InitialState();
+                break;
+            case ADDRESS_PROCESSING:
+                AddressProcessingState();
+                break;
+            case DATA_PROCESSING:
+                DataProcessingState();
+                break;
+            default:
+                break;
+    }
+    SysTickReset();
+}
+
+void MasterMain()
+{
+
+    //
+    // Reset SPI
+    //
+    MAP_SPIReset(GSPI_BASE);
+
+    //
+    // Configure SPI interface
+    //
+    MAP_SPIConfigSetExpClk(GSPI_BASE,MAP_PRCMPeripheralClockGet(PRCM_GSPI),
+                     SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_0,
+                     (SPI_SW_CTRL_CS |
+                     SPI_4PIN_MODE |
+                     SPI_TURBO_OFF |
+                     SPI_CS_ACTIVEHIGH |
+                     SPI_WL_8));
+
+    //
+    // Enable SPI for communication
+    //
+    MAP_SPIEnable(GSPI_BASE);
+
+}
+
+/**
+ * Initializes SysTick Module
+ */
+static void SysTickInit(void) {
+
+    // configure the reset value for the systick countdown register
+    MAP_SysTickPeriodSet(SYSTICK_RELOAD_VAL);
+
+    // register interrupts on the systick module
+    MAP_SysTickIntRegister(SysTickHandler);
+
+    // enable interrupts on systick
+    // (trigger SysTickHandler when countdown reaches 0)
+    MAP_SysTickIntEnable();
+
+    // enable the systick module itself
+    MAP_SysTickEnable();
+}
+
+void printText(int type_array) {
+    int pixelX = 0;
+    int pixelY = 0;
+    int i = 0;
+    // don't let x or y go past 128
+    if (type_array) {
+        Report("PRINT FUNC ui16 Char Count: %d\n\r", ui16CharCounter);
+        Report("FINAL PRINT FUNC Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
+
+        for (i = 0; i < ui16CharCounter; i++) {
+//            Report('i=%d , char= %c\n\r', i, ucCharBuffer[i]);
+            drawChar(pixelX, pixelY, ucCharBuffer[i], MAGENTA, MAGENTA, 1);
+            pixelX += 8;
+            if (pixelX > 127) {
+                pixelX = 0;
+                pixelY += 8;
+            }
+        }
+
+//        drawChar(pixelX, pixelY, 'G', MAGENTA, MAGENTA, 1);
+    } else {
+        Report("should never run this\n\r");
+        for (i = 0; i < letter_count; i++) {
+                drawChar(pixelX, pixelY, dad[i], MAGENTA, MAGENTA, 1);
+            pixelX += 8;
+            if (pixelX > 127) {
+                pixelX = 0;
+                pixelY += 8;
+            }
+        }
+    }
+    globalX = 0;
+    globalY = 70;
+
+}
+
+void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
+    // append letter to board + increment X
+    fillRect(globalX, globalY-8, 8, 8, BLACK);
+    if (draw) {
+        drawChar(globalX, globalY-8, letter, color, color, 1);
+        if ((same_button_counter == 0) || (pressed_button == 0))
+            letter_count++;
+        else {
+            letter_count = letter_count;
+        }
+        dad[letter_count - 1] = letter;
+        if (confirmPrint){
+            globalX += 8;
+            if (globalX > 127) {
+                globalX = 0;
+                globalY += 8;
+            }
+        }
+    } else {
+        int boundX = globalX - 8; int boundY = globalY;
+        // letter_count--;
+        // check if there is a letter to erase
+        if (!(boundX == 0 && boundY == 128)) {
+            // erase last letter from above row
+            if (boundX < 0) {
+                boundX = 120;
+                boundY -= 8;
+            }
+            fillRect(boundX, boundY-8, 8, 8, BLACK);
+
+            globalX = boundX;
+            globalY = boundY;
+        }
+    }
+    Report("Current message: %.*s\n\r", letter_count, dad);
+}
+
+void PrintAndClearTextString() {
+    fillScreen(BLACK);
+    Report("Final letter count: %d\n\r", letter_count);
+//    Report("FINAL Text message: %.*s\n\r", letter_count, text);
+    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
+    int i = 0;
+    for (i = 0; i < letter_count; i++) {
+        UARTCharPut(UARTA1_BASE, dad[i]);
+    }
+    printText(0);
+    letter_count = 0;
+    memset(dad, 0, sizeof(dad));
+    memset(text, 0, sizeof(text));
+}
+
+void PrintAndClearReceivedTextString() {
+    fillScreen(BLACK);
+//    Report("FINAL Text message: %.*s\n\r", letter_count, text);
+    Report("FINAL RECEIVED Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
+
+    printText(1);
+    ui16CharCounter = 0;
+//    memset(ucCharBuffer, 0, sizeof(ucCharBuffer));
+}
+
+void PrintPressedButton() {
+    if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
+    else if (strcmp(data, ARRAY_1) == 0) { Message("You Pressed 1.\n\r"); }
+    else if (strcmp(data, ARRAY_2) == 0) { Message("You Pressed 2.\n\r"); }
+    else if (strcmp(data, ARRAY_3) == 0) { Message("You Pressed 3.\n\r"); }
+    else if (strcmp(data, ARRAY_4) == 0) { Message("You Pressed 4.\n\r"); }
+    else if (strcmp(data, ARRAY_5) == 0) { Message("You Pressed 5.\n\r"); }
+    else if (strcmp(data, ARRAY_6) == 0) { Message("You Pressed 6.\n\r"); }
+    else if (strcmp(data, ARRAY_7) == 0) { Message("You Pressed 7.\n\r"); }
+    else if (strcmp(data, ARRAY_8) == 0) { Message("You Pressed 8.\n\r"); }
+    else if (strcmp(data, ARRAY_9) == 0) { Message("You Pressed 9.\n\r"); }
+    else if (strcmp(data, ARRAY_LAST) == 0) { Message("You Pressed LAST.\n\r"); }
+    else if (strcmp(data, ARRAY_MUTE) == 0) { Message("You Pressed MUTE.\n\r"); }
+    return;
+}
+
+void DetectOverwrite() {
+    //Report("Letter count = %d\n\r", letter_count);
+    if (same_button_counter == 0) {
+        //Report("text[%d] = %c\n\r", letter_count, text[letter_count]);
+        updateChar(text[letter_count], MAGENTA, 1, 1);
+        //letter_count++;
+    } else {
+        //Report("text[%d]-1 = %c\n\r", letter_count, text[letter_count]-1);
+        //letter_count--;
+        updateChar(text[letter_count]-1, MAGENTA, 0, 0);
+        //letter_count--;
+        updateChar(text[letter_count], MAGENTA, 1, 1);
+    }
+}
+
+void CheckMultiTap() {
+    switch (pressed_button) {
+        case 0:
+            updateChar(' ', MAGENTA, 1, 1);
+            text[letter_count] = ' ';
+            break;
+        case 2:
+            DetectOverwrite();
+            break;
+        case 3:
+            DetectOverwrite();
+            break;
+        case 4:
+            DetectOverwrite();
+            break;
+        case 5:
+            DetectOverwrite();
+            break;
+        case 6:
+            DetectOverwrite();
+            break;
+        case 7:
+            DetectOverwrite();
+            break;
+        case 8:
+            DetectOverwrite();
+            break;
+        case 9:
+            DetectOverwrite();
+            break;
+        case 10: // LAST -> our delete for now
+            text[letter_count] = 0;
+            letter_count --;
+            updateChar(' ', MAGENTA, 0, 0);
+            break;
+        case 11: // MUTE -> for entering the string
+            PrintAndClearTextString();
+            return;
+        default:
+            break;
+
+    }
+    return;
+}
+
+void updateButtonPress() {
+    time_t curr_pressed_time;
+    curr_pressed_time = time(NULL);
+    interval = difftime(curr_pressed_time, prev_button_pressed_time);
+
+    if (pressed_button == prev && interval <= 2 && ((pressed_button == 9 && same_button_counter < 3)
+          || (pressed_button == 7 && same_button_counter < 3)  || same_button_counter < 2)) {
+        same_button_counter++;
+    } else {
+        same_button_counter = 0;
+    }
+
+    switch (pressed_button) {
+        case 2:
+            text[letter_count] = 'A' + same_button_counter;
+            break;
+        case 3:
+            text[letter_count] = 'D' + same_button_counter;
+            break;
+        case 4:
+            text[letter_count] = 'G' + same_button_counter;
+            break;
+        case 5:
+            text[letter_count] = 'J' + same_button_counter;
+            break;
+        case 6:
+            text[letter_count] = 'M' + same_button_counter;
+            break;
+        case 7:
+            text[letter_count] = 'P' + same_button_counter;
+            break;
+        case 8:
+            text[letter_count] = 'T' + same_button_counter;
+            break;
+        case 9:
+            text[letter_count] = 'W' + same_button_counter;
+            break;
+        default:
+            break;
+    }
+    prev_button_pressed_time = curr_pressed_time;
+}
+
+void SetPressedNumber() {
+    if (letter_count == 0) {
+        prev_button_pressed_time = time(NULL);
+    }
+
+    if (strcmp(data, ARRAY_0) == 0) { pressed_button = 0; }
+    else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress();}
+    else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress();}
+    else if (strcmp(data, ARRAY_4) == 0) { pressed_button = 4; updateButtonPress();}
+    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress();}
+    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress();}
+    else if (strcmp(data, ARRAY_7) == 0) { pressed_button = 7; updateButtonPress();}
+    else if (strcmp(data, ARRAY_8) == 0) { pressed_button = 8; updateButtonPress();}
+    else if (strcmp(data, ARRAY_9) == 0) { pressed_button = 9; updateButtonPress();}
+    else if (strcmp(data, ARRAY_LAST) == 0) { pressed_button = 10; }
+    else if (strcmp(data, ARRAY_MUTE) == 0) { pressed_button = 11; }
+    else { return; }
+    prev = pressed_button;
+
+    CheckMultiTap();
+}
+
+void PrintMeaningfulInfo() {
+        //int i = 0;
+//        for (i = 0; i < 33; i++) {
+//            Report("systick_get[%d] = %llu\t systick_get_ms[%d] = %.3f\t",
+//                   i, systick_get[i], i, systick_get_ms[i]);
+//            if (i < 17) {
+//                Report("bit: %c\n\r", start_and_address[i]);
+//            } else {
+//                Report("bit: %c\n\r", data[i-17]);
+//            }
+//        }
+//        Report("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\r");
+        PrintPressedButton();
+        ClearArrays();
+}
+
+void GetMeaningfulInfo() {
+    SetPressedNumber();
+    ClearArrays();
+}
+
+void printtextapp() {
+    drawChar(15, 64, 'T', YELLOW, YELLOW, 2);
+    drawChar(25, 64, 'e', YELLOW, YELLOW, 2);
+    drawChar(35, 64, 'x', YELLOW, YELLOW, 2);
+    drawChar(45, 64, 't', YELLOW, YELLOW, 2);
+    drawChar(55, 64, ' ', YELLOW, YELLOW, 2);
+    drawChar(65, 64, 'A', YELLOW, YELLOW, 2);
+    drawChar(75, 64, 'p', YELLOW, YELLOW, 2);
+    drawChar(85, 64, 'p', YELLOW, YELLOW, 2);
+}
+
+void
+InitTerm_0()
+{
+#ifndef NOTERM
+  MAP_UARTConfigSetExpClk(BOARD_TO_BOARD,MAP_PRCMPeripheralClockGet(BOARD_TO_BOARD_PERIPH),
+                  UART_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                   UART_CONFIG_PAR_NONE));
+#endif
+  __Errorlog = 0;
+}
+
+static void UARTIntHandler() {
+    uart_int_count++;
+    unsigned long ulStatus;
+    ulStatus = MAP_UARTIntStatus(UARTA1_BASE, 1);
+    MAP_UARTIntClear(UARTA1_BASE, ulStatus);
+    while (UARTCharsAvail(UARTA1_BASE)) {
+        ucCharBuffer[ui16CharCounter] = UARTCharGet(UARTA1_BASE);
+        ui16CharCounter++;
+    }
+}
+
 //*****************************************************************************
 //
 //! Main 
@@ -876,6 +1440,8 @@ int connectToAccessPoint() {
 //*****************************************************************************
 void main() {
     long lRetVal = -1;
+
+    unsigned long ulStatus;
     //
     // Initialize board configuration
     //
@@ -886,6 +1452,52 @@ void main() {
     InitTerm();
     ClearTerm();
     UART_PRINT("My terminal works!\n\r");
+
+    //
+    // Register the interrupt handlers
+    //
+    MAP_GPIOIntRegister(GPIOA3_BASE, GPIOA3IntHandler);
+
+    //
+    // Configure falling edge interrupts on IR
+    //
+    MAP_GPIOIntTypeSet(GPIOA3_BASE, 0x10, GPIO_FALLING_EDGE);    // IR
+
+    ulStatus = MAP_GPIOIntStatus (GPIOA3_BASE, false);
+    MAP_GPIOIntClear(GPIOA3_BASE, ulStatus);            // clear interrupts on GPIOA3
+
+
+    // clear global variables
+    IR_intcount=0;
+    IR_intflag=0;
+    state = 0;
+
+    // Enable IR interrupts
+    MAP_GPIOIntEnable(GPIOA3_BASE, 0x10);
+    MasterMain();
+    Adafruit_Init();
+    fillScreen(BLACK);
+    printtextapp();
+    delay(10); fillScreen(BLACK);
+
+    Message("\t\t****************************************************\n\r");
+    Message("\t\tIR Interrupt\n\r");
+    Message("\t\t ****************************************************\n\r");
+    Message("\n\n\n\r");
+
+    while (1) {
+        while ((IR_intflag==0) /*&& (UART_RX_intflag == 0)*/) {
+            if (ui16CharCounter > 0) {
+                Report("FINAL while loop Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
+                PrintAndClearReceivedTextString();
+            }
+        }
+        if ((IR_intflag)) {
+            IR_intflag=0;  // clear flag
+            SetPressedNumber();
+            IR_intcount = 0;
+        }
+    }
 
     //Connect the CC3200 to the local access point
     lRetVal = connectToAccessPoint();
@@ -901,7 +1513,7 @@ void main() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal);
-    http_get(lRetVal);
+    //http_get(lRetVal);
 
     sl_Stop(SL_STOP_TIMEOUT);
     LOOP_FOREVER();
@@ -1000,7 +1612,7 @@ static int http_get(int iTLSSockID) {
     lRetVal = sl_Send(iTLSSockID, acSendBuff, strlen(acSendBuff), 0);
     UART_PRINT("lRetVal = %i\n\r", lRetVal);
     if(lRetVal < 0) {
-        UART_PRINT("POST failed. Error Number: %i\n\r",lRetVal);
+        UART_PRINT("GET failed. Error Number: %i\n\r",lRetVal);
         sl_Close(iTLSSockID);
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
         return lRetVal;
@@ -1018,4 +1630,6 @@ static int http_get(int iTLSSockID) {
         UART_PRINT(acRecvbuff);
         UART_PRINT("\n\r\n\r");
     }
+
+    return 0;
 }

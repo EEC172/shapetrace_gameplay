@@ -8,11 +8,14 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./Adafruit_GFX.obj" \
+"./Adafruit_OLED.obj" \
 "./gpio_if.obj" \
 "./main.obj" \
 "./network_common.obj" \
-"./pinmux.obj" \
+"./pin_mux_config.obj" \
 "./startup_ccs.obj" \
+"./test.obj" \
 "./uart_if.obj" \
 "../cc3200v1p32.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -125,21 +128,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-lab4.out \
+lab4_pt3.out \
 
 EXE_OUTPUTS__QUOTED += \
-"lab4.out" \
+"lab4_pt3.out" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "lab4.out"
+	@$(MAKE) --no-print-directory -Onone "lab4_pt3.out"
 
 # Tool invocations
-lab4.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+lab4_pt3.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=none -me -Ooff --define=ccs --define=cc3200 -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"lab4.map" --heap_size=0x8000 --stack_size=0x1000 -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="lab4_linkInfo.xml" --rom_model -o "lab4.out" $(ORDERED_OBJS)
+	"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=none -me -Ooff --define=ccs --define=cc3200 -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"lab4_pt3.map" --heap_size=0x8000 --stack_size=0x1000 -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="lab4_pt3_linkInfo.xml" --rom_model -o "lab4_pt3.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -147,13 +150,13 @@ lab4.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "gpio_if.obj" "main.obj" "network_common.obj" "pinmux.obj" "startup_ccs.obj" "uart_if.obj" 
-	-$(RM) "gpio_if.d" "main.d" "network_common.d" "pinmux.d" "startup_ccs.d" "uart_if.d" 
+	-$(RM) "Adafruit_GFX.obj" "Adafruit_OLED.obj" "gpio_if.obj" "main.obj" "network_common.obj" "pin_mux_config.obj" "startup_ccs.obj" "test.obj" "uart_if.obj" 
+	-$(RM) "Adafruit_GFX.d" "Adafruit_OLED.d" "gpio_if.d" "main.d" "network_common.d" "pin_mux_config.d" "startup_ccs.d" "test.d" "uart_if.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
 post-build:
-	-/Applications/TI/ccs/utils/tiobj2bin/tiobj2bin lab4.out lab4.bin /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armofd /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armhex /Applications/TI/ccs/utils/tiobj2bin/mkhex4bin
+	-/Applications/TI/ccs/utils/tiobj2bin/tiobj2bin lab4_pt3.out lab4_pt3.bin /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armofd /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armhex /Applications/TI/ccs/utils/tiobj2bin/mkhex4bin
 	-@echo ' '
 
 .PHONY: all clean dependents

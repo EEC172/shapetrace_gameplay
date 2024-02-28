@@ -7,51 +7,69 @@ CMD_SRCS += \
 ../cc3200v1p32.cmd 
 
 C_SRCS += \
+../Adafruit_GFX.c \
+../Adafruit_OLED.c \
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.c \
 ../main.c \
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/network_common.c \
-../pinmux.c \
+../pin_mux_config.c \
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/startup_ccs.c \
+../test.c \
 ../uart_if.c 
 
 C_DEPS += \
+./Adafruit_GFX.d \
+./Adafruit_OLED.d \
 ./gpio_if.d \
 ./main.d \
 ./network_common.d \
-./pinmux.d \
+./pin_mux_config.d \
 ./startup_ccs.d \
+./test.d \
 ./uart_if.d 
 
 OBJS += \
+./Adafruit_GFX.obj \
+./Adafruit_OLED.obj \
 ./gpio_if.obj \
 ./main.obj \
 ./network_common.obj \
-./pinmux.obj \
+./pin_mux_config.obj \
 ./startup_ccs.obj \
+./test.obj \
 ./uart_if.obj 
 
 OBJS__QUOTED += \
+"Adafruit_GFX.obj" \
+"Adafruit_OLED.obj" \
 "gpio_if.obj" \
 "main.obj" \
 "network_common.obj" \
-"pinmux.obj" \
+"pin_mux_config.obj" \
 "startup_ccs.obj" \
+"test.obj" \
 "uart_if.obj" 
 
 C_DEPS__QUOTED += \
+"Adafruit_GFX.d" \
+"Adafruit_OLED.d" \
 "gpio_if.d" \
 "main.d" \
 "network_common.d" \
-"pinmux.d" \
+"pin_mux_config.d" \
 "startup_ccs.d" \
+"test.d" \
 "uart_if.d" 
 
 C_SRCS__QUOTED += \
+"../Adafruit_GFX.c" \
+"../Adafruit_OLED.c" \
 "/Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.c" \
 "../main.c" \
 "/Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/network_common.c" \
-"../pinmux.c" \
+"../pin_mux_config.c" \
 "/Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/startup_ccs.c" \
+"../test.c" \
 "../uart_if.c" 
 
 
