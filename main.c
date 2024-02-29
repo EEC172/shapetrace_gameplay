@@ -1599,7 +1599,7 @@ static int http_post(int iTLSSockID, char *AWSString) {
     pcBufHeaders += strlen(CHEADER);
     strcpy(pcBufHeaders, "\r\n\r\n");
 
-    int dataLength = strlen(DATA1);
+    int dataLength = strlen(AWSString);
 
     strcpy(pcBufHeaders, CTHEADER);
     pcBufHeaders += strlen(CTHEADER);
@@ -1628,7 +1628,7 @@ static int http_post(int iTLSSockID, char *AWSString) {
     // Send the packet to the server */
     //
     lRetVal = sl_Send(iTLSSockID, acSendBuff, strlen(acSendBuff), 0);
-    //UART_PRINT("lRetVal 1 = %i\n\r", lRetVal);
+    UART_PRINT("lRetVal 1 = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("POST failed. Error Number: %i\n\r",lRetVal);
         sl_Close(iTLSSockID);
@@ -1636,7 +1636,7 @@ static int http_post(int iTLSSockID, char *AWSString) {
         return lRetVal;
     }
     lRetVal = sl_Recv(iTLSSockID, &acRecvbuff[0], sizeof(acRecvbuff), 0);
-    //UART_PRINT("lRetVal 2 = %i\n\r", lRetVal);
+    UART_PRINT("lRetVal 2 = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("Received failed. Error Number: %i\n\r",lRetVal);
         //sl_Close(iSSLSockID);
