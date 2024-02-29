@@ -1146,7 +1146,6 @@ void printText(int type_array) {
         Report("FINAL PRINT FUNC Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
 
         for (i = 0; i < ui16CharCounter; i++) {
-//            Report('i=%d , char= %c\n\r', i, ucCharBuffer[i]);
             drawChar(pixelX, pixelY, ucCharBuffer[i], MAGENTA, MAGENTA, 1);
             pixelX += 8;
             if (pixelX > 127) {
@@ -1154,8 +1153,6 @@ void printText(int type_array) {
                 pixelY += 8;
             }
         }
-
-//        drawChar(pixelX, pixelY, 'G', MAGENTA, MAGENTA, 1);
     } else {
         Report("should never run this\n\r");
         for (i = 0; i < letter_count; i++) {
@@ -1192,7 +1189,6 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
         }
     } else {
         int boundX = globalX - 8; int boundY = globalY;
-        // letter_count--;
         // check if there is a letter to erase
         if (!(boundX == 0 && boundY == 128)) {
             // erase last letter from above row
@@ -1212,16 +1208,8 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
 void PrintAndClearTextString() {
     fillScreen(BLACK);
     Report("Final letter count: %d\n\r", letter_count);
-//    Report("FINAL Text message: %.*s\n\r", letter_count, text);
     Report("FINAL Text message: %.*s\n\r", letter_count, dad);
-    //int i = 0;
-//    for (i = 0; i < letter_count; i++) {
-//        UARTCharPut(UARTA1_BASE, dad[i]);
-//    }
     printText(0);
-//    letter_count = 0;
-//    memset(dad, 0, sizeof(dad));
-//    memset(text, 0, sizeof(text));
 }
 
 void SetUpForHTTPPost() {
@@ -1246,28 +1234,14 @@ void SetUpForHTTPPost() {
     if(lRetVal < 0) {
         ERR_PRINT(lRetVal);
     }
-    //Report("I AM HERE\n\r");
     http_post(lRetVal, aws_string);
-    //http_get(lRetVal);
 
     sl_Stop(SL_STOP_TIMEOUT);
     LOOP_FOREVER();
-    //Report("I AM HERE\n\r");
     letter_count = 0;
     memset(dad, 0, sizeof(dad));
     memset(text, 0, sizeof(text));
 }
-
-
-//void PrintAndClearReceivedTextString() {
-//    fillScreen(BLACK);
-////    Report("FINAL Text message: %.*s\n\r", letter_count, text);
-//    Report("FINAL RECEIVED Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
-//
-//    printText(1);
-//    ui16CharCounter = 0;
-////    memset(ucCharBuffer, 0, sizeof(ucCharBuffer));
-//}
 
 void PrintPressedButton() {
     if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
@@ -1286,16 +1260,10 @@ void PrintPressedButton() {
 }
 
 void DetectOverwrite() {
-    //Report("Letter count = %d\n\r", letter_count);
     if (same_button_counter == 0) {
-        //Report("text[%d] = %c\n\r", letter_count, text[letter_count]);
         updateChar(text[letter_count], MAGENTA, 1, 1);
-        //letter_count++;
     } else {
-        //Report("text[%d]-1 = %c\n\r", letter_count, text[letter_count]-1);
-        //letter_count--;
         updateChar(text[letter_count]-1, MAGENTA, 0, 0);
-        //letter_count--;
         updateChar(text[letter_count], MAGENTA, 1, 1);
     }
 }
@@ -1336,7 +1304,6 @@ void CheckMultiTap() {
             updateChar(' ', MAGENTA, 0, 0);
             break;
         case 11: // MUTE -> for entering the string
-            //PrintAndClearTextString();
             SetUpForHTTPPost();
             return;
         default:
@@ -1442,28 +1409,6 @@ void printtextapp() {
     drawChar(85, 64, 'p', YELLOW, YELLOW, 2);
 }
 
-//void
-//InitTerm_0()
-//{
-//#ifndef NOTERM
-//  MAP_UARTConfigSetExpClk(BOARD_TO_BOARD,MAP_PRCMPeripheralClockGet(BOARD_TO_BOARD_PERIPH),
-//                  UART_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-//                   UART_CONFIG_PAR_NONE));
-//#endif
-//  __Errorlog = 0;
-//}
-//
-//static void UARTIntHandler() {
-//    uart_int_count++;
-//    unsigned long ulStatus;
-//    ulStatus = MAP_UARTIntStatus(UARTA1_BASE, 1);
-//    MAP_UARTIntClear(UARTA1_BASE, ulStatus);
-//    while (UARTCharsAvail(UARTA1_BASE)) {
-//        ucCharBuffer[ui16CharCounter] = UARTCharGet(UARTA1_BASE);
-//        ui16CharCounter++;
-//    }
-//}
-
 //*****************************************************************************
 //
 //! Main 
@@ -1523,29 +1468,8 @@ void main() {
     Message("\t\t ****************************************************\n\r");
     Message("\n\n\n\r");
 
-//    //Connect the CC3200 to the local access point
-//   lRetVal = connectToAccessPoint();
-//   //Set time so that encryption can be used
-//   lRetVal = set_time();
-//   if(lRetVal < 0) {
-//       UART_PRINT("Unable to set time in the device");
-//       LOOP_FOREVER();
-//   }
-//   //Connect to the website with TLS encryption
-//   lRetVal = tls_connect();
-//   if(lRetVal < 0) {
-//       ERR_PRINT(lRetVal);
-//   }
-//   Report("I AM HERE\n\r");
-
     while (1) {
-        while ((IR_intflag==0) /*&& (UART_RX_intflag == 0)*/) {
-//            if (ui16CharCounter > 0) {
-//                Report("FINAL while loop Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
-//                PrintAndClearReceivedTextString();
-//            }
-            ;
-        }
+        while ((IR_intflag==0)) {;}
         if ((IR_intflag)) {
             IR_intflag=0;  // clear flag
             //PrintPressedButton();
@@ -1553,27 +1477,6 @@ void main() {
             IR_intcount = 0;
         }
     }
-
-//    sl_Stop(SL_STOP_TIMEOUT);
-//    LOOP_FOREVER();
-//    //Connect the CC3200 to the local access point
-//    lRetVal = connectToAccessPoint();
-//    //Set time so that encryption can be used
-//    lRetVal = set_time();
-//    if(lRetVal < 0) {
-//        UART_PRINT("Unable to set time in the device");
-//        LOOP_FOREVER();
-//    }
-//    //Connect to the website with TLS encryption
-//    lRetVal = tls_connect();
-//    if(lRetVal < 0) {
-//        ERR_PRINT(lRetVal);
-//    }
-//    http_post(lRetVal);
-//    //http_get(lRetVal);
-//
-//    sl_Stop(SL_STOP_TIMEOUT);
-//    LOOP_FOREVER();
 }
 //*****************************************************************************
 //
@@ -1583,7 +1486,6 @@ void main() {
 //*****************************************************************************
 
 static int http_post(int iTLSSockID, char *AWSString) {
-    //Report("AFSDASDFADSFFFADSAFDSDFSA");
     char acSendBuff[512];
     char acRecvbuff[1460];
     char cCLLength[200];
@@ -1612,9 +1514,6 @@ static int http_post(int iTLSSockID, char *AWSString) {
     pcBufHeaders += strlen(cCLLength);
     strcpy(pcBufHeaders, CLHEADER2);
     pcBufHeaders += strlen(CLHEADER2);
-
-//    strcpy(pcBufHeaders, DATA1);
-//    pcBufHeaders += strlen(DATA1);
 
     strcpy(pcBufHeaders, AWSString);
     pcBufHeaders += strlen(AWSString);
