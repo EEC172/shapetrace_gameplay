@@ -271,7 +271,7 @@ static void BoardInit(void);
 static long InitializeAppVariables();
 static int tls_connect();
 static int connectToAccessPoint();
-static int http_post(int);
+static int http_post(int, char*);
 
 //*****************************************************************************
 // SimpleLink Asynchronous Event Handlers -- Start
@@ -1214,25 +1214,60 @@ void PrintAndClearTextString() {
     Report("Final letter count: %d\n\r", letter_count);
 //    Report("FINAL Text message: %.*s\n\r", letter_count, text);
     Report("FINAL Text message: %.*s\n\r", letter_count, dad);
-    int i = 0;
-    for (i = 0; i < letter_count; i++) {
-        UARTCharPut(UARTA1_BASE, dad[i]);
-    }
+    //int i = 0;
+//    for (i = 0; i < letter_count; i++) {
+//        UARTCharPut(UARTA1_BASE, dad[i]);
+//    }
     printText(0);
+//    letter_count = 0;
+//    memset(dad, 0, sizeof(dad));
+//    memset(text, 0, sizeof(text));
+}
+
+void SetUpForHTTPPost() {
+    PrintAndClearTextString();
+    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"%s\"\r\n}}}\r\n\r\n";
+    int length_of_aws_string = snprintf(NULL, 0, json_template, dad);
+    char aws_string[length_of_aws_string + 1];
+    snprintf(aws_string, sizeof(aws_string), json_template, dad);
+    //Report("AWS String: %s\n\r", aws_string);
+    long lRetVal = -1;
+
+    //Connect the CC3200 to the local access point
+    lRetVal = connectToAccessPoint();
+    //Set time so that encryption can be used
+    lRetVal = set_time();
+    if(lRetVal < 0) {
+        UART_PRINT("Unable to set time in the device");
+        LOOP_FOREVER();
+    }
+    //Connect to the website with TLS encryption
+    lRetVal = tls_connect();
+    if(lRetVal < 0) {
+        ERR_PRINT(lRetVal);
+    }
+    //Report("I AM HERE\n\r");
+    http_post(lRetVal, aws_string);
+    //http_get(lRetVal);
+
+    sl_Stop(SL_STOP_TIMEOUT);
+    LOOP_FOREVER();
+    //Report("I AM HERE\n\r");
     letter_count = 0;
     memset(dad, 0, sizeof(dad));
     memset(text, 0, sizeof(text));
 }
 
-void PrintAndClearReceivedTextString() {
-    fillScreen(BLACK);
-//    Report("FINAL Text message: %.*s\n\r", letter_count, text);
-    Report("FINAL RECEIVED Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
 
-    printText(1);
-    ui16CharCounter = 0;
-//    memset(ucCharBuffer, 0, sizeof(ucCharBuffer));
-}
+//void PrintAndClearReceivedTextString() {
+//    fillScreen(BLACK);
+////    Report("FINAL Text message: %.*s\n\r", letter_count, text);
+//    Report("FINAL RECEIVED Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
+//
+//    printText(1);
+//    ui16CharCounter = 0;
+////    memset(ucCharBuffer, 0, sizeof(ucCharBuffer));
+//}
 
 void PrintPressedButton() {
     if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
@@ -1301,7 +1336,8 @@ void CheckMultiTap() {
             updateChar(' ', MAGENTA, 0, 0);
             break;
         case 11: // MUTE -> for entering the string
-            PrintAndClearTextString();
+            //PrintAndClearTextString();
+            SetUpForHTTPPost();
             return;
         default:
             break;
@@ -1357,7 +1393,6 @@ void SetPressedNumber() {
     if (letter_count == 0) {
         prev_button_pressed_time = time(NULL);
     }
-
     if (strcmp(data, ARRAY_0) == 0) { pressed_button = 0; }
     else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress();}
     else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress();}
@@ -1407,27 +1442,27 @@ void printtextapp() {
     drawChar(85, 64, 'p', YELLOW, YELLOW, 2);
 }
 
-void
-InitTerm_0()
-{
-#ifndef NOTERM
-  MAP_UARTConfigSetExpClk(BOARD_TO_BOARD,MAP_PRCMPeripheralClockGet(BOARD_TO_BOARD_PERIPH),
-                  UART_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                   UART_CONFIG_PAR_NONE));
-#endif
-  __Errorlog = 0;
-}
-
-static void UARTIntHandler() {
-    uart_int_count++;
-    unsigned long ulStatus;
-    ulStatus = MAP_UARTIntStatus(UARTA1_BASE, 1);
-    MAP_UARTIntClear(UARTA1_BASE, ulStatus);
-    while (UARTCharsAvail(UARTA1_BASE)) {
-        ucCharBuffer[ui16CharCounter] = UARTCharGet(UARTA1_BASE);
-        ui16CharCounter++;
-    }
-}
+//void
+//InitTerm_0()
+//{
+//#ifndef NOTERM
+//  MAP_UARTConfigSetExpClk(BOARD_TO_BOARD,MAP_PRCMPeripheralClockGet(BOARD_TO_BOARD_PERIPH),
+//                  UART_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+//                   UART_CONFIG_PAR_NONE));
+//#endif
+//  __Errorlog = 0;
+//}
+//
+//static void UARTIntHandler() {
+//    uart_int_count++;
+//    unsigned long ulStatus;
+//    ulStatus = MAP_UARTIntStatus(UARTA1_BASE, 1);
+//    MAP_UARTIntClear(UARTA1_BASE, ulStatus);
+//    while (UARTCharsAvail(UARTA1_BASE)) {
+//        ucCharBuffer[ui16CharCounter] = UARTCharGet(UARTA1_BASE);
+//        ui16CharCounter++;
+//    }
+//}
 
 //*****************************************************************************
 //
@@ -1439,7 +1474,7 @@ static void UARTIntHandler() {
 //!
 //*****************************************************************************
 void main() {
-    long lRetVal = -1;
+    //long lRetVal = -1;
 
     unsigned long ulStatus;
     //
@@ -1448,6 +1483,9 @@ void main() {
     BoardInit();
 
     PinMuxConfig();
+
+    // Enable SysTick
+    SysTickInit();
 
     InitTerm();
     ClearTerm();
@@ -1485,38 +1523,57 @@ void main() {
     Message("\t\t ****************************************************\n\r");
     Message("\n\n\n\r");
 
+//    //Connect the CC3200 to the local access point
+//   lRetVal = connectToAccessPoint();
+//   //Set time so that encryption can be used
+//   lRetVal = set_time();
+//   if(lRetVal < 0) {
+//       UART_PRINT("Unable to set time in the device");
+//       LOOP_FOREVER();
+//   }
+//   //Connect to the website with TLS encryption
+//   lRetVal = tls_connect();
+//   if(lRetVal < 0) {
+//       ERR_PRINT(lRetVal);
+//   }
+//   Report("I AM HERE\n\r");
+
     while (1) {
         while ((IR_intflag==0) /*&& (UART_RX_intflag == 0)*/) {
-            if (ui16CharCounter > 0) {
-                Report("FINAL while loop Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
-                PrintAndClearReceivedTextString();
-            }
+//            if (ui16CharCounter > 0) {
+//                Report("FINAL while loop Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
+//                PrintAndClearReceivedTextString();
+//            }
+            ;
         }
         if ((IR_intflag)) {
             IR_intflag=0;  // clear flag
+            //PrintPressedButton();
             SetPressedNumber();
             IR_intcount = 0;
         }
     }
 
-    //Connect the CC3200 to the local access point
-    lRetVal = connectToAccessPoint();
-    //Set time so that encryption can be used
-    lRetVal = set_time();
-    if(lRetVal < 0) {
-        UART_PRINT("Unable to set time in the device");
-        LOOP_FOREVER();
-    }
-    //Connect to the website with TLS encryption
-    lRetVal = tls_connect();
-    if(lRetVal < 0) {
-        ERR_PRINT(lRetVal);
-    }
-    http_post(lRetVal);
-    //http_get(lRetVal);
-
-    sl_Stop(SL_STOP_TIMEOUT);
-    LOOP_FOREVER();
+//    sl_Stop(SL_STOP_TIMEOUT);
+//    LOOP_FOREVER();
+//    //Connect the CC3200 to the local access point
+//    lRetVal = connectToAccessPoint();
+//    //Set time so that encryption can be used
+//    lRetVal = set_time();
+//    if(lRetVal < 0) {
+//        UART_PRINT("Unable to set time in the device");
+//        LOOP_FOREVER();
+//    }
+//    //Connect to the website with TLS encryption
+//    lRetVal = tls_connect();
+//    if(lRetVal < 0) {
+//        ERR_PRINT(lRetVal);
+//    }
+//    http_post(lRetVal);
+//    //http_get(lRetVal);
+//
+//    sl_Stop(SL_STOP_TIMEOUT);
+//    LOOP_FOREVER();
 }
 //*****************************************************************************
 //
@@ -1525,7 +1582,8 @@ void main() {
 //
 //*****************************************************************************
 
-static int http_post(int iTLSSockID){
+static int http_post(int iTLSSockID, char *AWSString) {
+    //Report("AFSDASDFADSFFFADSAFDSDFSA");
     char acSendBuff[512];
     char acRecvbuff[1460];
     char cCLLength[200];
@@ -1555,8 +1613,11 @@ static int http_post(int iTLSSockID){
     strcpy(pcBufHeaders, CLHEADER2);
     pcBufHeaders += strlen(CLHEADER2);
 
-    strcpy(pcBufHeaders, DATA1);
-    pcBufHeaders += strlen(DATA1);
+//    strcpy(pcBufHeaders, DATA1);
+//    pcBufHeaders += strlen(DATA1);
+
+    strcpy(pcBufHeaders, AWSString);
+    pcBufHeaders += strlen(AWSString);
 
     int testDataLength = strlen(pcBufHeaders);
 
@@ -1567,7 +1628,7 @@ static int http_post(int iTLSSockID){
     // Send the packet to the server */
     //
     lRetVal = sl_Send(iTLSSockID, acSendBuff, strlen(acSendBuff), 0);
-    UART_PRINT("lRetVal = %i\n\r", lRetVal);
+    //UART_PRINT("lRetVal 1 = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("POST failed. Error Number: %i\n\r",lRetVal);
         sl_Close(iTLSSockID);
@@ -1575,7 +1636,7 @@ static int http_post(int iTLSSockID){
         return lRetVal;
     }
     lRetVal = sl_Recv(iTLSSockID, &acRecvbuff[0], sizeof(acRecvbuff), 0);
-    UART_PRINT("lRetVal = %i\n\r", lRetVal);
+    //UART_PRINT("lRetVal 2 = %i\n\r", lRetVal);
     if(lRetVal < 0) {
         UART_PRINT("Received failed. Error Number: %i\n\r",lRetVal);
         //sl_Close(iSSLSockID);
