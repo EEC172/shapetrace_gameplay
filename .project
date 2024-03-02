@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>lab4_pt3</name>
+	<name>final_project</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -29,6 +29,11 @@
 			<name>gpio_if.c</name>
 			<type>1</type>
 			<locationURI>CC3200_SDK_ROOT/example/common/gpio_if.c</locationURI>
+		</link>
+		<link>
+			<name>i2c_if.c</name>
+			<type>1</type>
+			<locationURI>CC3200_SDK_ROOT/example/common/i2c_if.c</locationURI>
 		</link>
 		<link>
 			<name>network_common.c</name>
