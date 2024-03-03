@@ -1,6 +1,8 @@
 # FIXED
 
 main.obj: ../main.c
+main.obj: ../macros.h
+main.obj: ../includes.h
 main.obj: /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h
 main.obj: /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/_ti_config.h
 main.obj: /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/linkage.h
@@ -58,6 +60,10 @@ main.obj: ../common.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if.h
 
 ../main.c:
+
+../macros.h:
+
+../includes.h:
 
 /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdio.h:
 

@@ -57,78 +57,9 @@
 //
 //*****************************************************************************
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <time.h>
+#include "macros.h"
+#include "includes.h"
 
-// Simplelink includes
-#include "simplelink.h"
-
-//Driverlib includes
-#include "hw_types.h"
-#include "hw_ints.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "interrupt.h"
-#include "prcm.h"
-#include "utils.h"
-#include "uart.h"
-#include "spi.h"
-#include "hw_nvic.h"
-#include "hw_memmap.h"
-#include "hw_common_reg.h"
-#include "interrupt.h"
-#include "hw_apps_rcm.h"
-#include "glcdfont.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "prcm.h"
-#include "gpio.h"
-#include "utils.h"
-#include "systick.h"
-#include "Adafruit_GFX.h"
-#include "Adafruit_SSD1351.h"
-#include "uart.h"
-
-//Common interface includes
-//#include "pinmux.h"
-#include "gpio_if.h"
-#include "common.h"
-#include "uart_if.h"
-
-#define MAX_URI_SIZE 128
-#define URI_SIZE MAX_URI_SIZE + 1
-
-
-#define APPLICATION_NAME        "SSL"
-#define APPLICATION_VERSION     "1.1.1.EEC.Spring2018"
-#define SERVER_NAME             "avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com"
-#define GOOGLE_DST_PORT         8443
-
-#define SL_SSL_CA_CERT "/cert/rootCA.der" //starfield class2 rootca (from firefox) // <-- this one works
-#define SL_SSL_PRIVATE "/cert/private.der"
-#define SL_SSL_CLIENT  "/cert/client.der"
-
-
-//NEED TO UPDATE THIS FOR IT TO WORK!
-#define DATE                25    /* Current Date */
-#define MONTH               2     /* Month 1-12 */
-#define YEAR                2024  /* Current year */
-#define HOUR                23    /* Time - hours */
-#define MINUTE              06    /* Time - minutes */
-#define SECOND              0     /* Time - seconds */
-
-#define POSTHEADER "POST /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
-#define GETHEADER "GET /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
-#define HOSTHEADER "Host: avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com\r\n"
-#define CHEADER "Connection: Keep-Alive\r\n"
-#define CTHEADER "Content-Type: application/json; charset=utf-8\r\n"
-#define CLHEADER1 "Content-Length: "
-#define CLHEADER2 "\r\n\r\n"
-
-#define DATA1 "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"This message is to our email!\"\r\n}}}\r\n\r\n"
 // Application specific status/error codes
 typedef enum{
     // Choosing -0x7D0 to avoid overlap w/ host-driver's error codes
@@ -172,24 +103,6 @@ extern void (* const g_pfnVectors[])(void);
 extern uVectorEntry __vector_table;
 #endif
 
-// some helpful macros for systick
-
-// the cc3200's fixed clock frequency of 80 MHz
-// note the use of ULL to indicate an unsigned long long constant
-#define SYSCLKFREQ 80000000ULL
-
-// macro to convert ticks to microseconds
-#define TICKS_TO_US(ticks) \
-    ((((ticks) / SYSCLKFREQ) * 1000000ULL) + \
-    ((((ticks) % SYSCLKFREQ) * 1000000ULL) / SYSCLKFREQ))\
-
-// macro to convert microseconds to ticks
-#define US_TO_TICKS(us) ((SYSCLKFREQ / 1000000ULL) * (us))
-
-// systick reload value set to 40ms period
-// (PERIOD_SEC) * (SYSCLKFREQ) = PERIOD_TICKS
-#define SYSTICK_RELOAD_VAL 3200000UL
-
 volatile uint64_t delta; volatile double delta_ms;
 
 // track systick counter periods elapsed
@@ -214,43 +127,6 @@ double interval;
 int globalX = 0; int globalY = 70;
 char dad[64];
 
-
-#define START_ADDRESS "20001000000010000"
-
-#define ARRAY_0 "1001000001101111"
-#define ARRAY_1 "0000000011111111"
-#define ARRAY_2 "1000000001111111"
-#define ARRAY_3 "0100000010111111"
-#define ARRAY_4 "1100000000111111"
-#define ARRAY_5 "0010000011011111"
-#define ARRAY_6 "1010000001011111"
-#define ARRAY_7 "0110000010011111"
-#define ARRAY_8 "1110000000011111"
-#define ARRAY_9 "0001000011101111"
-#define ARRAY_LAST "1011100001000111"
-#define ARRAY_MUTE "0010100011010111"
-
-#define INITIAL 0
-#define ADDRESS_PROCESSING 1
-#define DATA_PROCESSING 17
-volatile int state;
-
-#define BLACK           0x0000
-#define BLUE            0x001F
-#define GREEN           0x07E0
-#define CYAN            0x07FF
-#define RED             0xF800
-#define MAGENTA         0xF81F
-#define YELLOW          0xFFE0
-#define WHITE           0xFFFF
-
-#define HORIZONTAL      0
-#define VERTICAL        1
-
-#define SPI_IF_BIT_RATE  100000
-
-#define BOARD_TO_BOARD         UARTA1_BASE
-#define BOARD_TO_BOARD_PERIPH  PRCM_UARTA1
 unsigned char ucCharBuffer[64];
 uint16_t ui16CharCounter = 0;
 int uart_int_count = 0;
@@ -1300,7 +1176,7 @@ void CheckMultiTap() {
             break;
         case 10: // LAST -> our delete for now
             text[letter_count] = 0;
-            letter_count --;
+            letter_count--;
             updateChar(' ', MAGENTA, 0, 0);
             break;
         case 11: // MUTE -> for entering the string
@@ -1398,15 +1274,17 @@ void GetMeaningfulInfo() {
     ClearArrays();
 }
 
-void printtextapp() {
-    drawChar(15, 64, 'T', YELLOW, YELLOW, 2);
-    drawChar(25, 64, 'e', YELLOW, YELLOW, 2);
-    drawChar(35, 64, 'x', YELLOW, YELLOW, 2);
-    drawChar(45, 64, 't', YELLOW, YELLOW, 2);
-    drawChar(55, 64, ' ', YELLOW, YELLOW, 2);
-    drawChar(65, 64, 'A', YELLOW, YELLOW, 2);
-    drawChar(75, 64, 'p', YELLOW, YELLOW, 2);
-    drawChar(85, 64, 'p', YELLOW, YELLOW, 2);
+void PrintCoverPage() {
+    drawChar(10, 64, 'S', YELLOW, CYAN, 2);
+    drawChar(20, 64, 'h', YELLOW, CYAN, 2);
+    drawChar(30, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(40, 64, 'p', YELLOW, CYAN, 2);
+    drawChar(50, 64, 'e', YELLOW, CYAN, 2);
+    drawChar(60, 64, 'T', YELLOW, CYAN, 2);
+    drawChar(70, 64, 'r', YELLOW, CYAN, 2);
+    drawChar(80, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(90, 64, 'c', YELLOW, CYAN, 2);
+    drawChar(100, 64, 'e', YELLOW, CYAN, 2);
 }
 
 //*****************************************************************************
@@ -1460,7 +1338,7 @@ void main() {
     MasterMain();
     Adafruit_Init();
     fillScreen(BLACK);
-    printtextapp();
+    PrintCoverPage();
     delay(10); fillScreen(BLACK);
 
     Message("\t\t****************************************************\n\r");
