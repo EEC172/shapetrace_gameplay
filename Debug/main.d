@@ -55,6 +55,7 @@ main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/driverlib/gpio.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/driverlib/systick.h
 main.obj: ../Adafruit_GFX.h
 main.obj: ../Adafruit_SSD1351.h
+main.obj: ../pin_mux_config.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.h
 main.obj: ../common.h
 main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if.h
@@ -168,6 +169,8 @@ main.obj: /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/uart_if
 ../Adafruit_GFX.h:
 
 ../Adafruit_SSD1351.h:
+
+../pin_mux_config.h:
 
 /Applications/TI/lib/cc3200sdk_1.5.0/cc3200-sdk/example/common/gpio_if.h:
 
