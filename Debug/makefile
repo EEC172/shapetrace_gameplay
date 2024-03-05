@@ -10,9 +10,11 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./Adafruit_GFX.obj" \
 "./Adafruit_OLED.obj" \
+"./aws_util.obj" \
 "./gpio_if.obj" \
 "./i2c_if.obj" \
 "./i2c_util.obj" \
+"./ir_util.obj" \
 "./main.obj" \
 "./network_common.obj" \
 "./oled_util.obj" \
@@ -131,21 +133,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-final-project.out \
+final.out \
 
 EXE_OUTPUTS__QUOTED += \
-"final-project.out" \
+"final.out" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "final-project.out"
+	@$(MAKE) --no-print-directory -Onone "final.out"
 
 # Tool invocations
-final-project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+final.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=none -me -Ooff --define=ccs --define=cc3200 -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"final-project.map" --heap_size=0x8000 --stack_size=0x1000 -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="final-project_linkInfo.xml" --rom_model -o "final-project.out" $(ORDERED_OBJS)
+	"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=none -me -Ooff --define=ccs --define=cc3200 -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"final.map" --heap_size=0x8000 --stack_size=0x1000 -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/lib" -i"/Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="final_linkInfo.xml" --rom_model -o "final.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 	@$(MAKE) --no-print-directory post-build
@@ -153,13 +155,13 @@ final-project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Adafruit_GFX.obj" "Adafruit_OLED.obj" "gpio_if.obj" "i2c_if.obj" "i2c_util.obj" "main.obj" "network_common.obj" "oled_util.obj" "pin_mux_config.obj" "startup_ccs.obj" "test.obj" "uart_if.obj" 
-	-$(RM) "Adafruit_GFX.d" "Adafruit_OLED.d" "gpio_if.d" "i2c_if.d" "i2c_util.d" "main.d" "network_common.d" "oled_util.d" "pin_mux_config.d" "startup_ccs.d" "test.d" "uart_if.d" 
+	-$(RM) "Adafruit_GFX.obj" "Adafruit_OLED.obj" "aws_util.obj" "gpio_if.obj" "i2c_if.obj" "i2c_util.obj" "ir_util.obj" "main.obj" "network_common.obj" "oled_util.obj" "pin_mux_config.obj" "startup_ccs.obj" "test.obj" "uart_if.obj" 
+	-$(RM) "Adafruit_GFX.d" "Adafruit_OLED.d" "aws_util.d" "gpio_if.d" "i2c_if.d" "i2c_util.d" "ir_util.d" "main.d" "network_common.d" "oled_util.d" "pin_mux_config.d" "startup_ccs.d" "test.d" "uart_if.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
 post-build:
-	-/Applications/TI/ccs/utils/tiobj2bin/tiobj2bin final-project.out final-project.bin /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armofd /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armhex /Applications/TI/ccs/utils/tiobj2bin/mkhex4bin
+	-/Applications/TI/ccs/utils/tiobj2bin/tiobj2bin final.out final.bin /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armofd /Applications/TI/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/bin/armhex /Applications/TI/ccs/utils/tiobj2bin/mkhex4bin
 	-@echo ' '
 
 .PHONY: all clean dependents

@@ -28,13 +28,6 @@ typedef struct {
 } SlDateTime;
 
 // Global variables
-extern volatile unsigned long g_ulStatus;
-extern unsigned long g_ulPingPacketsRecv;
-extern unsigned long g_ulGatewayIP;
-extern unsigned char g_ucConnectionSSID[SSID_LEN_MAX+1];
-extern unsigned char g_ucConnectionBSSID[BSSID_LEN_MAX];
-extern signed char *g_Host;
-extern SlDateTime g_time;
 extern volatile uint64_t delta;
 extern volatile double delta_ms;
 extern volatile int systick_cnt;
@@ -60,7 +53,7 @@ extern uint16_t ui16CharCounter;
 extern int uart_int_count;
 extern int UART_RX_intflag;
 
-extern unsigned char reg_offset;
+//extern unsigned char reg_offset;
 //extern static unsigned long __Errorlog;
 
 #endif // GLOBALS_H

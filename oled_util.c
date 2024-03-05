@@ -3,6 +3,7 @@
 #include "globals.h"
 
 //Global Declarations
+int globalX = 0; int globalY = 70;
 void MasterMain();
 void PrintCoverPage();
 void printText(int);
