@@ -3,6 +3,7 @@
 #include "globals.h"
 
 //Global Declarations
+int globalX = 0; int globalY = 70;
 
 void MasterMain()
 {
@@ -27,6 +28,19 @@ void MasterMain()
     // Enable SPI for communication
     //
     MAP_SPIEnable(GSPI_BASE);
+}
+
+void PrintCoverPage() {
+    drawChar(10, 64, 'S', YELLOW, CYAN, 2);
+    drawChar(20, 64, 'h', YELLOW, CYAN, 2);
+    drawChar(30, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(40, 64, 'p', YELLOW, CYAN, 2);
+    drawChar(50, 64, 'e', YELLOW, CYAN, 2);
+    drawChar(60, 64, 'T', YELLOW, CYAN, 2);
+    drawChar(70, 64, 'r', YELLOW, CYAN, 2);
+    drawChar(80, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(90, 64, 'c', YELLOW, CYAN, 2);
+    drawChar(100, 64, 'e', YELLOW, CYAN, 2);
 }
 
 void printText(int type_array) {

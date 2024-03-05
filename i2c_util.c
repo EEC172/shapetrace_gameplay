@@ -2,6 +2,8 @@
 #include "macros.h"
 #include "globals.h"
 
+unsigned char reg_offset = 0x02;
+
 void I2CCode() {
     //
         // I2C Init
