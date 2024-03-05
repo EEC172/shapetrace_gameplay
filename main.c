@@ -183,25 +183,6 @@ static void GPIOA3IntHandler(void) { // IR handler
     SysTickReset();
 }
 
-/**
- * Initializes SysTick Module
- */
-static void SysTickInit(void) {
-
-    // configure the reset value for the systick countdown register
-    MAP_SysTickPeriodSet(SYSTICK_RELOAD_VAL);
-
-    // register interrupts on the systick module
-    MAP_SysTickIntRegister(SysTickHandler);
-
-    // enable interrupts on systick
-    // (trigger SysTickHandler when countdown reaches 0)
-    MAP_SysTickIntEnable();
-
-    // enable the systick module itself
-    MAP_SysTickEnable();
-}
-
 //*****************************************************************************
 //
 //! Main 
