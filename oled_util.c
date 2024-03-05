@@ -4,6 +4,10 @@
 
 //Global Declarations
 int globalX = 0; int globalY = 70;
+void MasterMain();
+void PrintCoverPage();
+void printText(int);
+void updateChar(char, unsigned int, int, int);
 
 void MasterMain()
 {
@@ -110,11 +114,4 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
         }
     }
     Report("Current message: %.*s\n\r", letter_count, dad);
-}
-
-void PrintAndClearTextString() {
-    fillScreen(BLACK);
-    Report("Final letter count: %d\n\r", letter_count);
-    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
-    printText(0);
 }
