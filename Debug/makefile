@@ -12,8 +12,10 @@ ORDERED_OBJS += \
 "./Adafruit_OLED.obj" \
 "./gpio_if.obj" \
 "./i2c_if.obj" \
+"./i2c_util.obj" \
 "./main.obj" \
 "./network_common.obj" \
+"./oled_util.obj" \
 "./pin_mux_config.obj" \
 "./startup_ccs.obj" \
 "./test.obj" \
@@ -151,8 +153,8 @@ final_project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Adafruit_GFX.obj" "Adafruit_OLED.obj" "gpio_if.obj" "i2c_if.obj" "main.obj" "network_common.obj" "pin_mux_config.obj" "startup_ccs.obj" "test.obj" "uart_if.obj" 
-	-$(RM) "Adafruit_GFX.d" "Adafruit_OLED.d" "gpio_if.d" "i2c_if.d" "main.d" "network_common.d" "pin_mux_config.d" "startup_ccs.d" "test.d" "uart_if.d" 
+	-$(RM) "Adafruit_GFX.obj" "Adafruit_OLED.obj" "gpio_if.obj" "i2c_if.obj" "i2c_util.obj" "main.obj" "network_common.obj" "oled_util.obj" "pin_mux_config.obj" "startup_ccs.obj" "test.obj" "uart_if.obj" 
+	-$(RM) "Adafruit_GFX.d" "Adafruit_OLED.d" "gpio_if.d" "i2c_if.d" "i2c_util.d" "main.d" "network_common.d" "oled_util.d" "pin_mux_config.d" "startup_ccs.d" "test.d" "uart_if.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

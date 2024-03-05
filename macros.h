@@ -84,5 +84,19 @@ volatile int state;
 #define VERTICAL        1
 
 #define SPI_IF_BIT_RATE  100000
+#define UART_PRINT              Report
+#define FOREVER                 1
+#define CONSOLE                 UARTA0_BASE
+#define FAILURE                 -1
+#define SUCCESS                 0
+#define RETERR_IF_TRUE(condition) {if(condition) return FAILURE;}
+#define RET_IF_ERR(Func)          {int iRetVal = (Func); \
+                                   if (SUCCESS != iRetVal) \
+                                     return  iRetVal;}
+#define HORIZONTAL      0
+#define VERTICAL        1
+
+#define SLAVE_ADDRESS 0x18
+#define RD_LEN        6
 
 #endif //includes.h
