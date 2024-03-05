@@ -964,6 +964,13 @@ static void SysTickInit(void) {
     MAP_SysTickEnable();
 }
 
+void PrintAndClearTextString() {
+    fillScreen(BLACK);
+    Report("Final letter count: %d\n\r", letter_count);
+    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
+    printText(0);
+}
+
 void SetUpForHTTPPost() {
     PrintAndClearTextString();
     char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"%s\"\r\n}}}\r\n\r\n";
@@ -1148,19 +1155,6 @@ void PrintMeaningfulInfo() {
 void GetMeaningfulInfo() {
     SetPressedNumber();
     ClearArrays();
-}
-
-void PrintCoverPage() {
-    drawChar(10, 64, 'S', YELLOW, CYAN, 2);
-    drawChar(20, 64, 'h', YELLOW, CYAN, 2);
-    drawChar(30, 64, 'a', YELLOW, CYAN, 2);
-    drawChar(40, 64, 'p', YELLOW, CYAN, 2);
-    drawChar(50, 64, 'e', YELLOW, CYAN, 2);
-    drawChar(60, 64, 'T', YELLOW, CYAN, 2);
-    drawChar(70, 64, 'r', YELLOW, CYAN, 2);
-    drawChar(80, 64, 'a', YELLOW, CYAN, 2);
-    drawChar(90, 64, 'c', YELLOW, CYAN, 2);
-    drawChar(100, 64, 'e', YELLOW, CYAN, 2);
 }
 
 //*****************************************************************************

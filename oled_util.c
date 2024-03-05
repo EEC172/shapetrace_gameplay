@@ -3,6 +3,10 @@
 #include "globals.h"
 
 //Global Declarations
+void MasterMain();
+void PrintCoverPage();
+void printText(int);
+void updateChar(char, unsigned int, int, int);
 
 void MasterMain()
 {
@@ -27,6 +31,19 @@ void MasterMain()
     // Enable SPI for communication
     //
     MAP_SPIEnable(GSPI_BASE);
+}
+
+void PrintCoverPage() {
+    drawChar(10, 64, 'S', YELLOW, CYAN, 2);
+    drawChar(20, 64, 'h', YELLOW, CYAN, 2);
+    drawChar(30, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(40, 64, 'p', YELLOW, CYAN, 2);
+    drawChar(50, 64, 'e', YELLOW, CYAN, 2);
+    drawChar(60, 64, 'T', YELLOW, CYAN, 2);
+    drawChar(70, 64, 'r', YELLOW, CYAN, 2);
+    drawChar(80, 64, 'a', YELLOW, CYAN, 2);
+    drawChar(90, 64, 'c', YELLOW, CYAN, 2);
+    drawChar(100, 64, 'e', YELLOW, CYAN, 2);
 }
 
 void printText(int type_array) {
@@ -96,11 +113,4 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
         }
     }
     Report("Current message: %.*s\n\r", letter_count, dad);
-}
-
-void PrintAndClearTextString() {
-    fillScreen(BLACK);
-    Report("Final letter count: %d\n\r", letter_count);
-    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
-    printText(0);
 }
