@@ -220,3 +220,47 @@ void SetPressedNumber() {
 
     CheckMultiTap();
 }
+
+void PrintAndClearTextString() {
+    fillScreen(BLACK);
+    Report("Final letter count: %d\n\r", letter_count);
+    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
+    printText(0);
+}
+
+void PrintPressedButton() {
+    if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
+    else if (strcmp(data, ARRAY_1) == 0) { Message("You Pressed 1.\n\r"); }
+    else if (strcmp(data, ARRAY_2) == 0) { Message("You Pressed 2.\n\r"); }
+    else if (strcmp(data, ARRAY_3) == 0) { Message("You Pressed 3.\n\r"); }
+    else if (strcmp(data, ARRAY_4) == 0) { Message("You Pressed 4.\n\r"); }
+    else if (strcmp(data, ARRAY_5) == 0) { Message("You Pressed 5.\n\r"); }
+    else if (strcmp(data, ARRAY_6) == 0) { Message("You Pressed 6.\n\r"); }
+    else if (strcmp(data, ARRAY_7) == 0) { Message("You Pressed 7.\n\r"); }
+    else if (strcmp(data, ARRAY_8) == 0) { Message("You Pressed 8.\n\r"); }
+    else if (strcmp(data, ARRAY_9) == 0) { Message("You Pressed 9.\n\r"); }
+    else if (strcmp(data, ARRAY_LAST) == 0) { Message("You Pressed LAST.\n\r"); }
+    else if (strcmp(data, ARRAY_MUTE) == 0) { Message("You Pressed MUTE.\n\r"); }
+    return;
+}
+
+void PrintMeaningfulInfo() {
+        //int i = 0;
+//        for (i = 0; i < 33; i++) {
+//            Report("systick_get[%d] = %llu\t systick_get_ms[%d] = %.3f\t",
+//                   i, systick_get[i], i, systick_get_ms[i]);
+//            if (i < 17) {
+//                Report("bit: %c\n\r", start_and_address[i]);
+//            } else {
+//                Report("bit: %c\n\r", data[i-17]);
+//            }
+//        }
+//        Report("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\r");
+        PrintPressedButton();
+        ClearArrays();
+}
+
+void GetMeaningfulInfo() {
+    SetPressedNumber();
+    ClearArrays();
+}

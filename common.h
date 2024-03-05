@@ -60,7 +60,7 @@ extern "C"
 
 /* For SECURITY_TYPE, set it to SL_SEC_TYPE_WPA if you're doing it at home
    In that case, you'd use your WiFi name (SSID_NAME) and your password here (SECURITY_KEY)*/
-#define SSID_NAME           "Lance2152"    /* AP SSID */
+#define SSID_NAME           "Grisha"    /* AP SSID */
 #define SECURITY_TYPE       SL_SEC_TYPE_OPEN/* Security type (OPEN or WEP or WPA*/
 #define SECURITY_KEY        ""              /* Password of the secured AP */
 #define SSID_LEN_MAX        32
