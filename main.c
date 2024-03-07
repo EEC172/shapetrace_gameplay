@@ -237,19 +237,21 @@ void main() {
     PrintCoverPage();
     delay(10); fillScreen(BLACK);
 
-    Message("\t\t****************************************************\n\r");
-    Message("\t\tIR Interrupt\n\r");
-    Message("\t\t ****************************************************\n\r");
-    Message("\n\n\n\r");
+    I2CCode();
 
-    while (1) {
-        while ((IR_intflag==0)) {;}
-        if ((IR_intflag)) {
-            IR_intflag=0;  // clear flag
-            //PrintPressedButton();
-            SetPressedNumber();
-            IR_intcount = 0;
-        }
-    }
+//    Message("\t\t****************************************************\n\r");
+//    Message("\t\tIR Interrupt\n\r");
+//    Message("\t\t ****************************************************\n\r");
+//    Message("\n\n\n\r");
+//
+//    while (1) {
+//        while ((IR_intflag==0)) {;}
+//        if ((IR_intflag)) {
+//            IR_intflag=0;  // clear flag
+//            //PrintPressedButton();
+//            SetPressedNumber();
+//            IR_intcount = 0;
+//        }
+//    }
 }
 

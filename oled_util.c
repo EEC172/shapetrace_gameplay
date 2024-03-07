@@ -47,6 +47,27 @@ void PrintCoverPage() {
     drawChar(100, 64, 'e', YELLOW, CYAN, 2);
 }
 
+void drawCompass() {
+    // horizontal line
+    drawLine(10, 0, 10, 20, CYAN);
+    // horizontal arrow left
+    drawLine(8, 18, 10, 20, CYAN);
+    drawLine(12, 18, 10, 20, CYAN);
+    // horizontal arrow right
+    drawLine(8, 2, 10, 0, CYAN);
+    drawLine(12, 2, 10, 0, CYAN);
+
+    // vertical
+    drawLine(0, 10, 20, 10, CYAN);
+    // vertical arrow up
+    drawLine(2, 12, 0, 10, CYAN);
+    drawLine(2, 8, 0, 10, CYAN);
+    // vertical arrow down
+    drawLine(18, 12, 20, 10, CYAN);
+    drawLine(18, 8, 20, 10, CYAN);
+
+}
+
 void printText(int type_array) {
     int pixelX = 0;
     int pixelY = 0;
@@ -57,7 +78,7 @@ void printText(int type_array) {
         Report("FINAL PRINT FUNC Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
 
         for (i = 0; i < ui16CharCounter; i++) {
-            drawChar(pixelX, pixelY, ucCharBuffer[i], MAGENTA, MAGENTA, 1);
+//            drawChar(pixelX, pixelY, ucCharBuffer[i], MAGENTA, MAGENTA, 1);
             pixelX += 8;
             if (pixelX > 127) {
                 pixelX = 0;
@@ -67,7 +88,7 @@ void printText(int type_array) {
     } else {
         Report("should never run this\n\r");
         for (i = 0; i < letter_count; i++) {
-                drawChar(pixelX, pixelY, dad[i], MAGENTA, MAGENTA, 1);
+//                drawChar(pixelX, pixelY, dad[i], MAGENTA, MAGENTA, 1);
             pixelX += 8;
             if (pixelX > 127) {
                 pixelX = 0;
@@ -82,9 +103,9 @@ void printText(int type_array) {
 
 void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
     // append letter to board + increment X
-    fillRect(globalX, globalY-8, 8, 8, BLACK);
+//    fillRect(globalX, globalY-8, 8, 8, BLACK);
     if (draw) {
-        drawChar(globalX, globalY-8, letter, color, color, 1);
+//        drawChar(globalX, globalY-8, letter, color, color, 1);
         if ((same_button_counter == 0) || (pressed_button == 0))
             letter_count++;
         else {
@@ -107,7 +128,7 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
                 boundX = 120;
                 boundY -= 8;
             }
-            fillRect(boundX, boundY-8, 8, 8, BLACK);
+//            fillRect(boundX, boundY-8, 8, 8, BLACK);
 
             globalX = boundX;
             globalY = boundY;
