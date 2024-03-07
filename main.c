@@ -243,13 +243,14 @@ void main() {
     Message("\n\n\n\r");
 
     while (1) {
-        while ((IR_intflag==0)) {;}
-        if ((IR_intflag)) {
-            IR_intflag=0;  // clear flag
-            //PrintPressedButton();
-            SetPressedNumber();
-            IR_intcount = 0;
-        }
+        DrawCircleAndUpdateArray(60, 60, 30, CYAN);
+//        while ((IR_intflag==0)) {;}
+//        if ((IR_intflag)) {
+//            IR_intflag=0;  // clear flag
+//            //PrintPressedButton();
+//            SetPressedNumber();
+//            IR_intcount = 0;
+//        }
     }
 }
 

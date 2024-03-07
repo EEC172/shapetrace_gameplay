@@ -56,4 +56,15 @@ extern int UART_RX_intflag;
 //extern unsigned char reg_offset;
 //extern static unsigned long __Errorlog;
 
+//typedef struct {
+//    /* time */
+//    int coordinateX;
+//    int coordinateY;
+//} Coordinate;
+//
+//extern Coordinate expected_coordinates[MAX_SIZE];
+extern char expectedX[128];
+extern char expectedY[128];
+extern int expected_pixel_count;
+
 #endif // GLOBALS_H
