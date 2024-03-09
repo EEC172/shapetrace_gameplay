@@ -4,26 +4,32 @@
 
 //Global Declarations
 int globalX = 0; int globalY = 70;
-char expectedX[128];
-char expectedY[128];
+//char expectedX[128];
+//char expectedY[128];
+Coordinate expected_coordinates[MAX_SIZE];
 int expected_pixel_count = 0;
 
-void ResetXAndY();
-void SetXAndYCoordinate(int, int);
-void MasterMain();
-void PrintCoverPage();
-void printText(int);
-void updateChar(char, unsigned int, int, int);
-void DrawSquareAndUpdatePixelArray();
-void DrawTriangleAndUpdateArray();
+//void ResetXAndY();
+//void SetXAndYCoordinate(int, int);
+//void MasterMain();
+//void PrintCoverPage();
+//void printText(int);
+//void updateChar(char, unsigned int, int, int);
+//void DrawSquareAndUpdatePixelArray();
+//void DrawTriangleAndUpdateArray();
 
 void ResetXAndY() {
-    memset(expectedX, '0', sizeof(expectedX));
-    memset(expectedY, '0', sizeof(expectedY));
+//    memset(expectedX, '0', sizeof(expectedX));
+//    memset(expectedY, '0', sizeof(expectedY));
+    memset(expected_coordinates, 0, sizeof(expected_coordinates));
+    expected_pixel_count = 0;
 }
 
 void SetXAndYCoordinate(int x, int y) {
-    expectedX[x] = '1'; expectedY[y] = '1';
+    //expectedX[x] = '1'; expectedY[y] = '1';
+    expected_coordinates[expected_pixel_count].coordinateX = x;
+    expected_coordinates[expected_pixel_count].coordinateY = y;
+    expected_pixel_count++;
 }
 
 void MasterMain()
@@ -62,6 +68,27 @@ void PrintCoverPage() {
     drawChar(80, 64, 'a', YELLOW, YELLOW, 2);
     drawChar(90, 64, 'c', YELLOW, YELLOW, 2);
     drawChar(100, 64, 'e', YELLOW, YELLOW, 2);
+}
+
+void drawCompass() {
+    // horizontal line
+    drawLine(10, 0, 10, 20, CYAN);
+    // horizontal arrow left
+    drawLine(8, 18, 10, 20, CYAN);
+    drawLine(12, 18, 10, 20, CYAN);
+    // horizontal arrow right
+    drawLine(8, 2, 10, 0, CYAN);
+    drawLine(12, 2, 10, 0, CYAN);
+
+    // vertical
+    drawLine(0, 10, 20, 10, CYAN);
+    // vertical arrow up
+    drawLine(2, 12, 0, 10, CYAN);
+    drawLine(2, 8, 0, 10, CYAN);
+    // vertical arrow down
+    drawLine(18, 12, 20, 10, CYAN);
+    drawLine(18, 8, 20, 10, CYAN);
+
 }
 
 void printText(int type_array) {
@@ -208,5 +235,5 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
         fillCircle(x0 - y, y0 - x, 1, color);
         SetXAndYCoordinate(x0-y, y0-x);
     }
-
+    Report("Current count: %d\n", expected_pixel_count);
 }

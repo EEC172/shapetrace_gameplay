@@ -236,14 +236,15 @@ void main() {
     fillScreen(BLACK);
     PrintCoverPage();
     delay(10); fillScreen(BLACK);
-
-    Message("\t\t****************************************************\n\r");
-    Message("\t\tIR Interrupt\n\r");
-    Message("\t\t ****************************************************\n\r");
-    Message("\n\n\n\r");
+    DrawCircleAndUpdateArray(60, 60, 30, CYAN);
+    drawCompass();
+//    Message("\t\t****************************************************\n\r");
+//    Message("\t\tIR Interrupt\n\r");
+//    Message("\t\t ****************************************************\n\r");
+//    Message("\n\n\n\r");
 
     while (1) {
-        DrawCircleAndUpdateArray(60, 60, 30, CYAN);
+        I2CCode();
 //        while ((IR_intflag==0)) {;}
 //        if ((IR_intflag)) {
 //            IR_intflag=0;  // clear flag
