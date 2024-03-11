@@ -4,10 +4,33 @@
 
 //Global Declarations
 int globalX = 0; int globalY = 70;
-void MasterMain();
-void PrintCoverPage();
-void printText(int);
-void updateChar(char, unsigned int, int, int);
+//char expectedX[128];
+//char expectedY[128];
+Coordinate expected_coordinates[MAX_SIZE];
+int expected_pixel_count = 0;
+
+//void ResetXAndY();
+//void SetXAndYCoordinate(int, int);
+//void MasterMain();
+//void PrintCoverPage();
+//void printText(int);
+//void updateChar(char, unsigned int, int, int);
+//void DrawSquareAndUpdatePixelArray();
+//void DrawTriangleAndUpdateArray();
+
+void ResetXAndY() {
+//    memset(expectedX, '0', sizeof(expectedX));
+//    memset(expectedY, '0', sizeof(expectedY));
+    memset(expected_coordinates, 0, sizeof(expected_coordinates));
+    expected_pixel_count = 0;
+}
+
+void SetXAndYCoordinate(int x, int y) {
+    //expectedX[x] = '1'; expectedY[y] = '1';
+    expected_coordinates[expected_pixel_count].coordinateX = x;
+    expected_coordinates[expected_pixel_count].coordinateY = y;
+    expected_pixel_count++;
+}
 
 void MasterMain()
 {
@@ -34,17 +57,72 @@ void MasterMain()
     MAP_SPIEnable(GSPI_BASE);
 }
 
+void PrintConstantString(const char *fixed_string, int x_prompt, int y_prompt, int color) {
+    int i = 0;
+    for (i = 0; i < strlen(fixed_string); i++) {
+        drawChar(x_prompt, y_prompt, fixed_string[i], color, color, 1);
+        x_prompt += 6;
+        if (x_prompt > 127) {
+            x_prompt = 0; y_prompt += 8;
+        }
+    }
+}
+
 void PrintCoverPage() {
-    drawChar(10, 64, 'S', YELLOW, CYAN, 2);
-    drawChar(20, 64, 'h', YELLOW, CYAN, 2);
-    drawChar(30, 64, 'a', YELLOW, CYAN, 2);
-    drawChar(40, 64, 'p', YELLOW, CYAN, 2);
-    drawChar(50, 64, 'e', YELLOW, CYAN, 2);
-    drawChar(60, 64, 'T', YELLOW, CYAN, 2);
-    drawChar(70, 64, 'r', YELLOW, CYAN, 2);
-    drawChar(80, 64, 'a', YELLOW, CYAN, 2);
-    drawChar(90, 64, 'c', YELLOW, CYAN, 2);
-    drawChar(100, 64, 'e', YELLOW, CYAN, 2);
+    drawChar(10, 64, 'S', YELLOW, YELLOW, 2);
+    drawChar(20, 64, 'h', YELLOW, YELLOW, 2);
+    drawChar(30, 64, 'a', YELLOW, YELLOW, 2);
+    drawChar(40, 64, 'p', YELLOW, YELLOW, 2);
+    drawChar(50, 64, 'e', YELLOW, YELLOW, 2);
+    drawChar(60, 64, 'T', YELLOW, YELLOW, 2);
+    drawChar(70, 64, 'r', YELLOW, YELLOW, 2);
+    drawChar(80, 64, 'a', YELLOW, YELLOW, 2);
+    drawChar(90, 64, 'c', YELLOW, YELLOW, 2);
+    drawChar(100, 64, 'e', YELLOW, YELLOW, 2);
+
+    const char *init_prompt = "Press 0 on IR to      continue";
+    PrintConstantString(init_prompt, 0, 100, WHITE);
+}
+
+void PrintInstructions() {
+    const char *orientation_prompt = "Orient CC3200         horizontally and place above OLED.";
+    PrintConstantString(orientation_prompt, 0, 0, YELLOW);
+    const char *tilt_instruction = "You will trace over a predrawn shape and    get an accuracy score.";
+    PrintConstantString(tilt_instruction, 0, 35, YELLOW);
+    const char *leaderboard = "Top accuracy scores   will display on a     leaderboard";
+    PrintConstantString(leaderboard, 0, 70, YELLOW);
+    const char *prompt = "Press 0 to advance";
+    PrintConstantString(prompt, 0, 115, WHITE);
+}
+
+void ShapeOptions() {
+    const char *square = "SQUARE -> PRESS 2";
+    PrintConstantString(square, 0, 20, CYAN);
+    const char *triangle = "TRIANGLE -> PRESS 3";
+    PrintConstantString(triangle, 0, 60, CYAN);
+    const char *circle = "CIRCLE -> PRESS 4";
+    PrintConstantString(circle, 0, 100, CYAN);
+}
+
+void drawCompass() {
+    // horizontal line
+    drawLine(10, 0, 10, 20, CYAN);
+    // horizontal arrow left
+    drawLine(8, 18, 10, 20, CYAN);
+    drawLine(12, 18, 10, 20, CYAN);
+    // horizontal arrow right
+    drawLine(8, 2, 10, 0, CYAN);
+    drawLine(12, 2, 10, 0, CYAN);
+
+    // vertical
+    drawLine(0, 10, 20, 10, CYAN);
+    // vertical arrow up
+    drawLine(2, 12, 0, 10, CYAN);
+    drawLine(2, 8, 0, 10, CYAN);
+    // vertical arrow down
+    drawLine(18, 12, 20, 10, CYAN);
+    drawLine(18, 8, 20, 10, CYAN);
+
 }
 
 void drawCompass() {
@@ -135,4 +213,82 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
         }
     }
     Report("Current message: %.*s\n\r", letter_count, dad);
+}
+
+void DrawSquareAndUpdateArray() {
+    ResetXAndY();
+    expected_pixel_count = 0;
+    int starting_point = 30;
+    int x = starting_point; int y = starting_point;
+    int limit = starting_point + SQUARE_SIZE;
+    for (y = starting_point; y < limit; y++) {
+        for (x = starting_point; x < limit; x++) {
+            if (y == starting_point || y == limit-1 || x == starting_point || x == limit-1) {
+                fillCircle(x, y, 1,CYAN);
+                SetXAndYCoordinate(x, y);
+            }
+        }
+    }
+}
+
+void DrawTriangleAndUpdateArray() {
+    ResetXAndY();
+    int base = 60; int height = 60; int starting_point = 30;
+    int x = starting_point; int y = starting_point;
+    for (y = starting_point; y < starting_point + height; y++) {
+        for (x = starting_point; x < starting_point + base - (y - 30); x++) {
+            if (x == starting_point || y == starting_point ||
+                    x == starting_point + base - (y - 30) - 1) {
+                fillCircle(x, y, 1, CYAN);
+                SetXAndYCoordinate(x, y);
+            }
+        }
+    }
+}
+
+void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
+      ResetXAndY();
+      int f = 1 - r;
+      int ddF_x = 1;
+      int ddF_y = -2 * r;
+      int x = 0;
+      int y = r;
+
+      fillCircle(x0  , y0+r, 1, color);
+      SetXAndYCoordinate(x0, y0+r);
+      fillCircle(x0  , y0-r, 1, color);
+      SetXAndYCoordinate(x0, y0-r);
+      fillCircle(x0+r, y0, 1, color);
+      SetXAndYCoordinate(x0, y0-r);
+      fillCircle(x0-r, y0, 1, color);
+      SetXAndYCoordinate(x0, y0-r);
+
+      while (x<y) {
+        if (f >= 0) {
+          y--;
+          ddF_y += 2;
+          f += ddF_y;
+        }
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        fillCircle(x0 + x, y0 + y, 1, color);
+        SetXAndYCoordinate(x0+x, y0+y);
+        fillCircle(x0 - x, y0 + y, 1, color);
+        SetXAndYCoordinate(x0-x, y0+y);
+        fillCircle(x0 + x, y0 - y, 1, color);
+        SetXAndYCoordinate(x0+x, y0-y);
+        fillCircle(x0 - x, y0 - y, 1, color);
+        SetXAndYCoordinate(x0-x, y0-y);
+        fillCircle(x0 + y, y0 + x, 1, color);
+        SetXAndYCoordinate(x0+y, y0-y);
+        fillCircle(x0 - y, y0 + x, 1, color);
+        SetXAndYCoordinate(x0-y, y0+x);
+        fillCircle(x0 + y, y0 - x, 1, color);
+        SetXAndYCoordinate(x0+y, y0-x);
+        fillCircle(x0 - y, y0 - x, 1, color);
+        SetXAndYCoordinate(x0-y, y0-x);
+    }
+    Report("Current count: %d\n", expected_pixel_count);
 }

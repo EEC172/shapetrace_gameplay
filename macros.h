@@ -99,4 +99,11 @@ volatile int state;
 #define SLAVE_ADDRESS 0x18
 #define RD_LEN        6
 
+#define SQUARE_SIZE 60
+#define MAX_SIZE 16384
+
+#define IS_SQUARE 2
+#define IS_TRIANGLE 3
+#define IS_CIRCLE 4
+
 #endif //includes.h
