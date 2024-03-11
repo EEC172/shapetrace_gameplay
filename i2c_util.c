@@ -68,6 +68,6 @@ void I2CCode() {
         UART_PRINT("new_X: 0x%02X\n", new_X);
         UART_PRINT("new_Y: 0x%02X\n", new_Y);
         fillCircle(XPosition, YPosition, radius, YELLOW);
-        delay(1);
+        delay(10);
     }
 }

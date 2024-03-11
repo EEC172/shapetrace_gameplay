@@ -12,6 +12,10 @@ volatile int systick_cnt = 0;
 volatile unsigned long IR_intcount;
 volatile unsigned char IR_intflag;
 
+volatile unsigned char setup_flag;
+
+volatile int shape_type = 0;
+
 uint64_t systick_get[33];
 double systick_get_ms[33];
 char start_and_address[17]; char data[16];
@@ -204,15 +208,15 @@ void SetPressedNumber() {
     if (letter_count == 0) {
         prev_button_pressed_time = time(NULL);
     }
-    if (strcmp(data, ARRAY_0) == 0) { pressed_button = 0; }
-    else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress();}
-    else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress();}
-    else if (strcmp(data, ARRAY_4) == 0) { pressed_button = 4; updateButtonPress();}
-    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress();}
-    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress();}
-    else if (strcmp(data, ARRAY_7) == 0) { pressed_button = 7; updateButtonPress();}
-    else if (strcmp(data, ARRAY_8) == 0) { pressed_button = 8; updateButtonPress();}
-    else if (strcmp(data, ARRAY_9) == 0) { pressed_button = 9; updateButtonPress();}
+    if (strcmp(data, ARRAY_0) == 0) { pressed_button = 0; setup_flag = 1; }
+    else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_4) == 0) { pressed_button = 4; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_7) == 0) { pressed_button = 7; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_8) == 0) { pressed_button = 8; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_9) == 0) { pressed_button = 9; updateButtonPress(); }
     else if (strcmp(data, ARRAY_LAST) == 0) { pressed_button = 10; }
     else if (strcmp(data, ARRAY_MUTE) == 0) { pressed_button = 11; }
     else { return; }
@@ -228,39 +232,84 @@ void PrintAndClearTextString() {
     printText(0);
 }
 
-void PrintPressedButton() {
-    if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
-    else if (strcmp(data, ARRAY_1) == 0) { Message("You Pressed 1.\n\r"); }
-    else if (strcmp(data, ARRAY_2) == 0) { Message("You Pressed 2.\n\r"); }
-    else if (strcmp(data, ARRAY_3) == 0) { Message("You Pressed 3.\n\r"); }
-    else if (strcmp(data, ARRAY_4) == 0) { Message("You Pressed 4.\n\r"); }
-    else if (strcmp(data, ARRAY_5) == 0) { Message("You Pressed 5.\n\r"); }
-    else if (strcmp(data, ARRAY_6) == 0) { Message("You Pressed 6.\n\r"); }
-    else if (strcmp(data, ARRAY_7) == 0) { Message("You Pressed 7.\n\r"); }
-    else if (strcmp(data, ARRAY_8) == 0) { Message("You Pressed 8.\n\r"); }
-    else if (strcmp(data, ARRAY_9) == 0) { Message("You Pressed 9.\n\r"); }
-    else if (strcmp(data, ARRAY_LAST) == 0) { Message("You Pressed LAST.\n\r"); }
-    else if (strcmp(data, ARRAY_MUTE) == 0) { Message("You Pressed MUTE.\n\r"); }
-    return;
-}
-
-void PrintMeaningfulInfo() {
-        //int i = 0;
-//        for (i = 0; i < 33; i++) {
-//            Report("systick_get[%d] = %llu\t systick_get_ms[%d] = %.3f\t",
-//                   i, systick_get[i], i, systick_get_ms[i]);
-//            if (i < 17) {
-//                Report("bit: %c\n\r", start_and_address[i]);
-//            } else {
-//                Report("bit: %c\n\r", data[i-17]);
-//            }
-//        }
-//        Report("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\r");
-        PrintPressedButton();
-        ClearArrays();
-}
-
 void GetMeaningfulInfo() {
     SetPressedNumber();
     ClearArrays();
 }
+
+void IRGameSetup() {
+    while (setup_flag == 0) {
+        while ((IR_intflag==0)) {;}
+        if ((IR_intflag)) {
+            IR_intflag=0;  // clear flag
+            SetPressedNumber(); IR_intcount = 0;
+            if (setup_flag == 1) {
+                setup_flag = 0;
+                fillScreen(BLACK);
+                break;
+            }
+        }
+    }
+}
+
+void IRRemoteOptionSetup() {
+    int chosen_button = 0; //temp variable
+    while (chosen_button == 0) {
+        while ((IR_intflag==0)) {;}
+        if (IR_intflag) {
+            IR_intflag=0;  // clear flag
+            SetPressedNumber(); IR_intcount = 0;
+            chosen_button = pressed_button;
+            if (chosen_button == 2) {
+                fillScreen(BLACK);
+                globalX = 30; globalY = 30;
+                DrawSquareAndUpdateArray();
+                chosen_button = 0; break;
+            } else if (chosen_button == 3) {
+                fillScreen(BLACK);
+                globalX = 30; globalY = 30;
+                DrawTriangleAndUpdateArray();
+                chosen_button = 0; break;
+            } else if (chosen_button == 4) {
+                fillScreen(BLACK);
+                globalX = 60; globalY = 30;
+                DrawCircleAndUpdateArray(60, 60, 30, CYAN);
+                chosen_button = 0; break;
+            }
+        }
+    }
+}
+
+
+//void PrintPressedButton() {
+//    if (strcmp(data, ARRAY_0) == 0) { Message("You Pressed 0.\n\r"); }
+//    else if (strcmp(data, ARRAY_1) == 0) { Message("You Pressed 1.\n\r"); }
+//    else if (strcmp(data, ARRAY_2) == 0) { Message("You Pressed 2.\n\r"); }
+//    else if (strcmp(data, ARRAY_3) == 0) { Message("You Pressed 3.\n\r"); }
+//    else if (strcmp(data, ARRAY_4) == 0) { Message("You Pressed 4.\n\r"); }
+//    else if (strcmp(data, ARRAY_5) == 0) { Message("You Pressed 5.\n\r"); }
+//    else if (strcmp(data, ARRAY_6) == 0) { Message("You Pressed 6.\n\r"); }
+//    else if (strcmp(data, ARRAY_7) == 0) { Message("You Pressed 7.\n\r"); }
+//    else if (strcmp(data, ARRAY_8) == 0) { Message("You Pressed 8.\n\r"); }
+//    else if (strcmp(data, ARRAY_9) == 0) { Message("You Pressed 9.\n\r"); }
+//    else if (strcmp(data, ARRAY_LAST) == 0) { Message("You Pressed LAST.\n\r"); }
+//    else if (strcmp(data, ARRAY_MUTE) == 0) { Message("You Pressed MUTE.\n\r"); }
+//    return;
+//}
+
+//void PrintMeaningfulInfo() {
+//        //int i = 0;
+////        for (i = 0; i < 33; i++) {
+////            Report("systick_get[%d] = %llu\t systick_get_ms[%d] = %.3f\t",
+////                   i, systick_get[i], i, systick_get_ms[i]);
+////            if (i < 17) {
+////                Report("bit: %c\n\r", start_and_address[i]);
+////            } else {
+////                Report("bit: %c\n\r", data[i-17]);
+////            }
+////        }
+////        Report("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\r");
+//        PrintPressedButton();
+//        ClearArrays();
+//}
+

@@ -73,7 +73,9 @@ extern void (* const g_pfnVectors[])(void);
 extern uVectorEntry __vector_table;
 #endif
 
-static unsigned long __Errorlog;
+//static unsigned long __Errorlog;
+
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End: df
 //*****************************************************************************
@@ -227,6 +229,7 @@ void main() {
     // clear global variables
     IR_intcount=0;
     IR_intflag=0;
+    setup_flag = 0;
     state = 0;
 
     // Enable IR interrupts
@@ -234,17 +237,21 @@ void main() {
     MasterMain();
     Adafruit_Init();
     fillScreen(BLACK);
-    PrintCoverPage();
-    delay(10); fillScreen(BLACK);
-    DrawCircleAndUpdateArray(60, 60, 30, CYAN);
-    drawCompass();
-//    Message("\t\t****************************************************\n\r");
-//    Message("\t\tIR Interrupt\n\r");
-//    Message("\t\t ****************************************************\n\r");
-//    Message("\n\n\n\r");
 
-    while (1) {
-        I2CCode();
+    PrintCoverPage();
+    IRGameSetup();
+
+    PrintInstructions();
+    IRGameSetup();
+
+    ShapeOptions();
+    IRRemoteOptionSetup();
+
+    drawCompass();
+    //DrawSquareAndUpdateArray();
+
+//    while (1) {
+//        I2CCode();
 //        while ((IR_intflag==0)) {;}
 //        if ((IR_intflag)) {
 //            IR_intflag=0;  // clear flag
@@ -252,6 +259,6 @@ void main() {
 //            SetPressedNumber();
 //            IR_intcount = 0;
 //        }
-    }
+//    }
 }
 
