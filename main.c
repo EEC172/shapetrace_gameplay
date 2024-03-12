@@ -246,8 +246,9 @@ void main() {
 
     ShapeOptions();
     IRRemoteOptionSetup();
+    I2CCode();
 
-    drawCompass();
+//    drawCompass();
     //DrawSquareAndUpdateArray();
 
 //    while (1) {

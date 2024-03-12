@@ -15,6 +15,9 @@ unsigned char  g_ucConnectionBSSID[BSSID_LEN_MAX]; //Connection BSSID
 signed char    *g_Host = SERVER_NAME;
 SlDateTime g_time;
 
+char rows[16];
+char cols[16];
+
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- End: df
 //*****************************************************************************
@@ -692,11 +695,27 @@ int connectToAccessPoint() {
 }
 
 void SetUpForHTTPPost() {
-    PrintAndClearTextString();
-    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"var\" : \"%s\"\r\n}}}\r\n\r\n";
-    int length_of_aws_string = snprintf(NULL, 0, json_template, dad);
-    char aws_string[length_of_aws_string + 1];
-    snprintf(aws_string, sizeof(aws_string), json_template, dad);
+//    PrintAndClearTextString();
+    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"rows\" : \"%s\", \"cols\" : \"%s\"\r\n}}}\r\n\r\n";
+
+    char rowHexString[33];
+    char colHexString[33];
+
+    int offset = 0;
+    int i;
+
+    for (i = 0; i < 16; i++) {
+        sprintf(rowHexString + offset, "%02X", (uint8_t)rows[i]);
+        sprintf(colHexString + offset, "%02X", (uint8_t)cols[i]);
+        offset += 2;
+    }
+    rowHexString[32] = '\0';
+    colHexString[32] = '\0';
+
+    int total_length = snprintf(NULL, 0, json_template, rowHexString, colHexString) + 1;
+    char post_string[total_length + 1];
+
+    snprintf(post_string, sizeof(post_string), json_template, rowHexString, colHexString);
     //Report("AWS String: %s\n\r", aws_string);
     long lRetVal = -1;
 
@@ -713,12 +732,13 @@ void SetUpForHTTPPost() {
     if(lRetVal < 0) {
         ERR_PRINT(lRetVal);
     }
-    http_post(lRetVal, aws_string);
+    http_post(lRetVal, post_string);
 
     sl_Stop(SL_STOP_TIMEOUT);
     LOOP_FOREVER(); // may be a problem!!
     letter_count = 0;
-    memset(dad, 0, sizeof(dad));
+    memset(rows, 0, sizeof(rows));
+    memset(cols, 0, sizeof(cols));
     memset(text, 0, sizeof(text));
 }
 
@@ -793,4 +813,27 @@ static int http_post(int iTLSSockID, char *AWSString) {
     }
 
     return 0;
+}
+
+// idk where else to put this but it updates the rows and cols array
+void modifyRowsBit(int x) {
+    int charIndex = x / 8;
+    int bitPos = x % 8;
+    rows[charIndex] |= (1 << bitPos);
+
+//    uint8_t *bytes = (uint8_t *)rows;
+//
+//    // Printing the bytes
+//    printf("Bytes: ");
+//    int i;
+//    for (i = 0; i < 16; i++) {
+//        printf("%02X ", bytes[i]);
+//    }
+//    printf("\n");
+}
+
+void modifyColsBit(int x) {
+    int charIndex = x / 8;
+    int bitPos = x % 8;
+    cols[charIndex] |= (1 << bitPos);
 }

@@ -63,9 +63,12 @@ typedef struct {
 } Coordinate;
 
 extern Coordinate expected_coordinates[MAX_SIZE];
-extern char expectedX[128];
-extern char expectedY[128];
+//extern char expectedX[128];
+//extern char expectedY[128];
 extern int expected_pixel_count;
+extern Coordinate actual_coordinates[5000];
+extern int actual_pixel_count;
+
 extern volatile unsigned char setup_flag;
 extern volatile int shape_type;
 

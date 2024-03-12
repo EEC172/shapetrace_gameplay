@@ -119,39 +119,40 @@ void DetectOverwrite() {
 void CheckMultiTap() {
     switch (pressed_button) {
         case 0:
-            updateChar(' ', MAGENTA, 1, 1);
-            text[letter_count] = ' ';
+            //updateChar(' ', MAGENTA, 1, 1);
+            //text[letter_count] = ' ';
             break;
         case 2:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 3:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 4:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 5:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 6:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 7:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 8:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 9:
-            DetectOverwrite();
+            //DetectOverwrite();
             break;
         case 10: // LAST -> our delete for now
-            text[letter_count] = 0;
-            letter_count--;
-            updateChar(' ', MAGENTA, 0, 0);
+            //text[letter_count] = 0;
+            //letter_count--;
+            //updateChar(' ', MAGENTA, 0, 0);
             break;
         case 11: // MUTE -> for entering the string
+            Report("In mute in multitap\n\r");
             SetUpForHTTPPost();
             return;
         default:
@@ -221,6 +222,7 @@ void SetPressedNumber() {
     else if (strcmp(data, ARRAY_MUTE) == 0) { pressed_button = 11; }
     else { return; }
     prev = pressed_button;
+    Report("%d\n\r", pressed_button);
 
     CheckMultiTap();
 }
@@ -312,4 +314,3 @@ void IRRemoteOptionSetup() {
 //        PrintPressedButton();
 //        ClearArrays();
 //}
-
