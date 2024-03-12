@@ -26,11 +26,13 @@ void I2CCode() {
     I2C_IF_Open(I2C_MASTER_MODE_FST);
 
     int XPosition = globalX; int YPosition = globalY;
-    int radius = 1;
-    fillCircle(XPosition, YPosition, radius, YELLOW);
+    int radius = 1; unsigned int color = YELLOW;
+    fillCircle(XPosition, YPosition, radius, color);
     unsigned char data_buffer[128];
     signed char new_X; signed char new_Y;
     drawCompass();
+    int chosen_button = 0;
+    int count = 0;
 
     while(1) {
         I2C_IF_Write(SLAVE_ADDRESS, &reg_offset, 1, 0);
@@ -63,21 +65,35 @@ void I2CCode() {
                 YPosition = 0 + radius;
             }
 
-            fillCircle(XPosition, YPosition, radius, YELLOW);
+            fillCircle(XPosition, YPosition, radius, color);
+            Report("X: %d\t Y: %d\t count: %d\n\r", XPosition, YPosition, count);
+            count++;
 //            UpdateActualCoordinates(XPosition, YPosition);
 //            Report("Actual Pixel Count: %d\n\r", actual_pixel_count);
             modifyRowsBit(XPosition); modifyColsBit(YPosition);
 
         }
         if (IR_intflag) {
-
+            IR_intflag=0;
             // sometimes doesn't register the MUTE button, just post anways
-//            SetPressedNumber(); IR_intcount = 0;
-            fillScreen(BLACK); // replace with ending screen + score
-            SetUpForHTTPPost();
-
-            break;
-
+            SetPressedNumber(); IR_intcount = 0;
+            chosen_button = pressed_button;
+            if (chosen_button == 11) {
+                fillScreen(BLACK); // replace with ending screen + score
+                SetUpForHTTPPost();
+                same_button_counter = 0;
+                break;
+            } else if (chosen_button == 10) {
+                fillScreen(BLACK);
+                same_button_counter = 0;
+                memset(rows, 0, sizeof(rows));
+                memset(cols, 0, sizeof(cols));
+                memset(text, 0, sizeof(text));
+                break;
+            }
+            if (same_button_counter == 1) { color = RED; }
+            else if (same_button_counter == 2) { color = GREEN; }
+            else if (same_button_counter == 3) { color = MAGENTA; }
         }
 
         delay(1);

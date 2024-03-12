@@ -150,11 +150,12 @@ void CheckMultiTap() {
             //text[letter_count] = 0;
             //letter_count--;
             //updateChar(' ', MAGENTA, 0, 0);
+            //fillScreen(BLACK);
             break;
         case 11: // MUTE -> for entering the string
-            Report("In mute in multitap\n\r");
-            SetUpForHTTPPost();
-            return;
+            //Report("In mute in multitap\n\r");
+            //SetUpForHTTPPost();
+            break;
         default:
             break;
 
@@ -167,41 +168,42 @@ void updateButtonPress() {
     curr_pressed_time = time(NULL);
     interval = difftime(curr_pressed_time, prev_button_pressed_time);
 
-    if (pressed_button == prev && interval <= 2 && ((pressed_button == 9 && same_button_counter < 3)
-          || (pressed_button == 7 && same_button_counter < 3)  || same_button_counter < 2)) {
+    if (pressed_button == 7 && pressed_button == prev && interval <= 2 &&
+            ((pressed_button == 9 && same_button_counter < 3) || (pressed_button == 7 && same_button_counter < 3)
+                    || same_button_counter < 2)) {
         same_button_counter++;
     } else {
         same_button_counter = 0;
     }
 
-    switch (pressed_button) {
-        case 2:
-            text[letter_count] = 'A' + same_button_counter;
-            break;
-        case 3:
-            text[letter_count] = 'D' + same_button_counter;
-            break;
-        case 4:
-            text[letter_count] = 'G' + same_button_counter;
-            break;
-        case 5:
-            text[letter_count] = 'J' + same_button_counter;
-            break;
-        case 6:
-            text[letter_count] = 'M' + same_button_counter;
-            break;
-        case 7:
-            text[letter_count] = 'P' + same_button_counter;
-            break;
-        case 8:
-            text[letter_count] = 'T' + same_button_counter;
-            break;
-        case 9:
-            text[letter_count] = 'W' + same_button_counter;
-            break;
-        default:
-            break;
-    }
+//    switch (pressed_button) {
+//        case 2:
+//            text[letter_count] = 'A' + same_button_counter;
+//            break;
+//        case 3:
+//            text[letter_count] = 'D' + same_button_counter;
+//            break;
+//        case 4:
+//            text[letter_count] = 'G' + same_button_counter;
+//            break;
+//        case 5:
+//            text[letter_count] = 'J' + same_button_counter;
+//            break;
+//        case 6:
+//            text[letter_count] = 'M' + same_button_counter;
+//            break;
+//        case 7:
+//            text[letter_count] = 'P' + same_button_counter;
+//            break;
+//        case 8:
+//            text[letter_count] = 'T' + same_button_counter;
+//            break;
+//        case 9:
+//            text[letter_count] = 'W' + same_button_counter;
+//            break;
+//        default:
+//            break;
+//    }
     prev_button_pressed_time = curr_pressed_time;
 }
 
@@ -213,8 +215,8 @@ void SetPressedNumber() {
     else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress(); }
     else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress(); }
     else if (strcmp(data, ARRAY_4) == 0) { pressed_button = 4; updateButtonPress(); }
-    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress(); }
-    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress(); }
+//    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress(); }
+//    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress(); }
     else if (strcmp(data, ARRAY_7) == 0) { pressed_button = 7; updateButtonPress(); }
     else if (strcmp(data, ARRAY_8) == 0) { pressed_button = 8; updateButtonPress(); }
     else if (strcmp(data, ARRAY_9) == 0) { pressed_button = 9; updateButtonPress(); }

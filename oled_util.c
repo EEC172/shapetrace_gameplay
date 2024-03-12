@@ -104,6 +104,27 @@ void ShapeOptions() {
     PrintConstantString(circle, 0, 100, CYAN);
 }
 
+void OtherRules() {
+    const char *multitap_heading = "MULTITAP (Press 7):";
+    PrintConstantString(multitap_heading, 0, 0, CYAN);
+    const char *tap1 = "Press 7 1x - Yellow";
+    const char *tap2 = "Press 7 2x - Red";
+    const char *tap3 = "Press 7 3x - Magenta";
+    const char *tap4 = "Press 7 4x - Green";
+    PrintConstantString(tap1, 0, 10, YELLOW);
+    PrintConstantString(tap2, 0, 20, RED);
+    PrintConstantString(tap3, 0, 30, MAGENTA);
+    PrintConstantString(tap4, 0, 40, GREEN);
+
+    const char *mute = "FINISH - Press MUTE";
+    const char *last = "RESTART - Press LAST";
+    PrintConstantString(mute, 0, 65, CYAN);
+    PrintConstantString(last, 0, 90, CYAN);
+
+    const char *prompt = "Press 0 to advance";
+    PrintConstantString(prompt, 0, 115, WHITE);
+}
+
 void drawCompass() {
     // horizontal line
     drawLine(10, 0, 10, 20, CYAN);

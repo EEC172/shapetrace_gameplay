@@ -72,4 +72,7 @@ extern int actual_pixel_count;
 extern volatile unsigned char setup_flag;
 extern volatile int shape_type;
 
+extern char rows[16];
+extern char cols[16];
+
 #endif // GLOBALS_H

@@ -185,6 +185,12 @@ static void GPIOA3IntHandler(void) { // IR handler
     SysTickReset();
 }
 
+void GameIterator() {
+    ShapeOptions();
+    IRRemoteOptionSetup();
+    I2CCode();
+}
+
 //*****************************************************************************
 //
 //! Main 
@@ -240,13 +246,14 @@ void main() {
 
     PrintCoverPage();
     IRGameSetup();
-
     PrintInstructions();
     IRGameSetup();
+    OtherRules();
+    IRGameSetup();
 
-    ShapeOptions();
-    IRRemoteOptionSetup();
-    I2CCode();
+    while (1) {
+        GameIterator();
+    }
 
 //    drawCompass();
     //DrawSquareAndUpdateArray();

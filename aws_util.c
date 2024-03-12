@@ -733,13 +733,13 @@ void SetUpForHTTPPost() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal, post_string);
-
-    sl_Stop(SL_STOP_TIMEOUT);
-    LOOP_FOREVER(); // may be a problem!!
+    //sl_Stop(SL_STOP_TIMEOUT);
+//    LOOP_FOREVER(); // may be a problem!!
     letter_count = 0;
     memset(rows, 0, sizeof(rows));
     memset(cols, 0, sizeof(cols));
     memset(text, 0, sizeof(text));
+
 }
 
 //*****************************************************************************
