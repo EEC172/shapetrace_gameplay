@@ -106,4 +106,7 @@ volatile int state;
 #define IS_TRIANGLE 3
 #define IS_CIRCLE 4
 
+#define ROWS 128
+#define COLS 128
+
 #endif //includes.h

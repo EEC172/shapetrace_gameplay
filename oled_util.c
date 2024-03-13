@@ -6,8 +6,9 @@
 int globalX = 0; int globalY = 70;
 //char expectedX[128];
 //char expectedY[128];
-Coordinate expected_coordinates[MAX_SIZE];
+//Coordinate expected_coordinates[MAX_SIZE];
 int expected_pixel_count = 0;
+char expected[ROWS][COLS];
 
 //void ResetXAndY();
 //void SetXAndYCoordinate(int, int);
@@ -21,14 +22,15 @@ int expected_pixel_count = 0;
 void ResetXAndY() {
 //    memset(expectedX, '0', sizeof(expectedX));
 //    memset(expectedY, '0', sizeof(expectedY));
-    memset(expected_coordinates, 0, sizeof(expected_coordinates));
-    expected_pixel_count = 0;
+    memset(expected, '0', sizeof(expected));
+//    expected_pixel_count = 0;
 }
 
 void SetXAndYCoordinate(int x, int y) {
     //expectedX[x] = '1'; expectedY[y] = '1';
-    expected_coordinates[expected_pixel_count].coordinateX = x;
-    expected_coordinates[expected_pixel_count].coordinateY = y;
+//    expected_coordinates[expected_pixel_count].coordinateX = x;
+//    expected_coordinates[expected_pixel_count].coordinateY = y;
+    expected[x][y] = '1';
     expected_pixel_count++;
 }
 
@@ -217,7 +219,7 @@ void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
 
 void DrawSquareAndUpdateArray() {
     ResetXAndY();
-    expected_pixel_count = 0;
+    //expected_pixel_count = 0;
     int starting_point = 30;
     int x = starting_point; int y = starting_point;
     int limit = starting_point + SQUARE_SIZE;
@@ -259,9 +261,9 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
       fillCircle(x0  , y0-r, 1, color);
       SetXAndYCoordinate(x0, y0-r);
       fillCircle(x0+r, y0, 1, color);
-      SetXAndYCoordinate(x0, y0-r);
+      SetXAndYCoordinate(x0+r, y0);
       fillCircle(x0-r, y0, 1, color);
-      SetXAndYCoordinate(x0, y0-r);
+      SetXAndYCoordinate(x0-r, y0);
 
       while (x<y) {
         if (f >= 0) {
@@ -282,7 +284,7 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
         fillCircle(x0 - x, y0 - y, 1, color);
         SetXAndYCoordinate(x0-x, y0-y);
         fillCircle(x0 + y, y0 + x, 1, color);
-        SetXAndYCoordinate(x0+y, y0-y);
+        SetXAndYCoordinate(x0+y, y0+x);
         fillCircle(x0 - y, y0 + x, 1, color);
         SetXAndYCoordinate(x0-y, y0+x);
         fillCircle(x0 + y, y0 - x, 1, color);
@@ -290,5 +292,5 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
         fillCircle(x0 - y, y0 - x, 1, color);
         SetXAndYCoordinate(x0-y, y0-x);
     }
-    Report("Current count: %d\n", expected_pixel_count);
+    //Report("Current count: %d\n", expected_pixel_count);
 }

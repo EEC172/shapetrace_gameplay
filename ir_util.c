@@ -226,7 +226,7 @@ void SetPressedNumber() {
     prev = pressed_button;
     Report("%d\n\r", pressed_button);
 
-    CheckMultiTap();
+    //CheckMultiTap();
 }
 
 void PrintAndClearTextString() {

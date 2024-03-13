@@ -75,4 +75,11 @@ extern volatile int shape_type;
 extern char rows[16];
 extern char cols[16];
 
+extern char expected[ROWS][COLS];
+extern char actual[ROWS][COLS];
+
+extern float max_points;
+extern float user_points;
+extern float accuracy_percentage;
+
 #endif // GLOBALS_H
