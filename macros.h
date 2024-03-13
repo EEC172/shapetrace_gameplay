@@ -109,4 +109,9 @@ volatile int state;
 #define ROWS 128
 #define COLS 128
 
+#define ERROR_RANGE sqrt(pow(4, 2) + pow(4, 2))
+
+#define ADD 1
+#define SUBTRACT -1
+
 #endif //includes.h

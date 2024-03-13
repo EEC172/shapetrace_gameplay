@@ -738,8 +738,10 @@ void SetUpForHTTPPost() {
     letter_count = 0;
     memset(rows, 0, sizeof(rows));
     memset(cols, 0, sizeof(cols));
-    memset(text, 0, sizeof(text));
-
+    //memset(text, 0, sizeof(text));
+    ResetXAndY();
+    ResetActualCoordinates();
+    Report("I FINISHED THE POST\n\r");
 }
 
 //*****************************************************************************

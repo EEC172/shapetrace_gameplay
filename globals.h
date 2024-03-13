@@ -70,7 +70,6 @@ extern Coordinate actual_coordinates[5000];
 extern int actual_pixel_count;
 
 extern volatile unsigned char setup_flag;
-extern volatile int shape_type;
 
 extern char rows[16];
 extern char cols[16];
@@ -81,5 +80,7 @@ extern char actual[ROWS][COLS];
 extern float max_points;
 extern float user_points;
 extern float accuracy_percentage;
+
+extern int shape_type;
 
 #endif // GLOBALS_H

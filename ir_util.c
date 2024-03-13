@@ -14,24 +14,26 @@ volatile unsigned char IR_intflag;
 
 volatile unsigned char setup_flag;
 
-volatile int shape_type = 0;
+//volatile int shape_type = 0;
 
 uint64_t systick_get[33];
 double systick_get_ms[33];
 char start_and_address[17]; char data[16];
 int letter_count = 0;
-char text[64];
+//char text[64];
 int pressed_button = 0; int prev = -1; int same_button_counter = 0;
 time_t prev_button_pressed_time;
 time_t uart_handler_time;
 double interval;
 
-char dad[64];
+//char dad[64];
 
-unsigned char ucCharBuffer[64];
-uint16_t ui16CharCounter = 0;
+//unsigned char ucCharBuffer[64];
+//uint16_t ui16CharCounter = 0;
 int uart_int_count = 0;
 int UART_RX_intflag = 0;
+
+int shape_type = 0;
 
 
 void ClearArrays(void) {
@@ -107,14 +109,14 @@ void DataProcessingState() {
 
 
 
-void DetectOverwrite() {
-    if (same_button_counter == 0) {
-        updateChar(text[letter_count], MAGENTA, 1, 1);
-    } else {
-        updateChar(text[letter_count]-1, MAGENTA, 0, 0);
-        updateChar(text[letter_count], MAGENTA, 1, 1);
-    }
-}
+//void DetectOverwrite() {
+//    if (same_button_counter == 0) {
+//        updateChar(text[letter_count], MAGENTA, 1, 1);
+//    } else {
+//        updateChar(text[letter_count]-1, MAGENTA, 0, 0);
+//        updateChar(text[letter_count], MAGENTA, 1, 1);
+//    }
+//}
 
 void CheckMultiTap() {
     switch (pressed_button) {
@@ -229,12 +231,12 @@ void SetPressedNumber() {
     //CheckMultiTap();
 }
 
-void PrintAndClearTextString() {
-    fillScreen(BLACK);
-    Report("Final letter count: %d\n\r", letter_count);
-    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
-    printText(0);
-}
+//void PrintAndClearTextString() {
+//    fillScreen(BLACK);
+//    Report("Final letter count: %d\n\r", letter_count);
+//    Report("FINAL Text message: %.*s\n\r", letter_count, dad);
+//    printText(0);
+//}
 
 void GetMeaningfulInfo() {
     SetPressedNumber();
@@ -264,17 +266,20 @@ void IRRemoteOptionSetup() {
             IR_intflag=0;  // clear flag
             SetPressedNumber(); IR_intcount = 0;
             chosen_button = pressed_button;
-            if (chosen_button == 2) {
+            if (chosen_button == IS_SQUARE) {
+                shape_type = IS_SQUARE;
                 fillScreen(BLACK);
                 globalX = 30; globalY = 30;
                 DrawSquareAndUpdateArray();
                 chosen_button = 0; break;
-            } else if (chosen_button == 3) {
+            } else if (chosen_button == IS_TRIANGLE) {
+                shape_type = IS_SQUARE;
                 fillScreen(BLACK);
                 globalX = 30; globalY = 30;
                 DrawTriangleAndUpdateArray();
                 chosen_button = 0; break;
-            } else if (chosen_button == 4) {
+            } else if (chosen_button == IS_CIRCLE) {
+                shape_type = IS_SQUARE;
                 fillScreen(BLACK);
                 globalX = 60; globalY = 30;
                 DrawCircleAndUpdateArray(60, 60, 30, CYAN);

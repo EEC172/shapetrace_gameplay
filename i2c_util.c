@@ -3,7 +3,6 @@
 #include "globals.h"
 
 unsigned char reg_offset = 0x02;
-//Coordinate actual_coordinates[5000];
 int actual_pixel_count = 0;
 char actual[ROWS][COLS];
 
@@ -13,12 +12,9 @@ void ResetActualCoordinates() {
 }
 //
 void UpdateActualCoordinates(int x, int y) {
-//    actual_coordinates[actual_pixel_count].coordinateX = x;
-//    actual_coordinates[actual_pixel_count].coordinateY = y;
-//    Report("X: %d\t Y: %d\t", actual_coordinates[actual_pixel_count].coordinateX,
-//           actual_coordinates[actual_pixel_count].coordinateY);
     actual[x][y] = '1';
     actual_pixel_count++;
+    Report("X: %d\t Y: %d\t count: %d\n\r", x, y, actual_pixel_count);
 }
 
 void I2CCode() {
@@ -31,11 +27,11 @@ void I2CCode() {
     int XPosition = globalX; int YPosition = globalY;
     int radius = 1; unsigned int color = YELLOW;
     fillCircle(XPosition, YPosition, radius, color);
+    UpdateActualCoordinates(XPosition, YPosition);
     unsigned char data_buffer[128];
     signed char new_X; signed char new_Y;
     drawCompass();
     int chosen_button = 0;
-    int count = 0;
 
     while(1) {
         I2C_IF_Write(SLAVE_ADDRESS, &reg_offset, 1, 0);
@@ -74,7 +70,6 @@ void I2CCode() {
             //count++;
 //            UpdateActualCoordinates(XPosition, YPosition);
 //            Report("Actual Pixel Count: %d\n\r", actual_pixel_count);
-
             //modifyRowsBit(XPosition); modifyColsBit(YPosition);
 
         }
@@ -89,20 +84,15 @@ void I2CCode() {
                 GenerateAccuracy();
                 SetUpForHTTPPost();
                 same_button_counter = 0;
-                //int y=0; int x=0;
-//                for (y = 0; y < COLS; y++) {
-//                    for (x = 0; x < ROWS; x++) {
-//                        Report("%c", actual[x][y]);
-//                    }
-//                    Report("\n\r");
-//                }
                 break;
             } else if (chosen_button == 10) {
                 fillScreen(BLACK);
                 same_button_counter = 0;
+                memset(actual, 0, sizeof(actual));
+                memset(expected, 0, sizeof(expected));
                 memset(rows, 0, sizeof(rows));
                 memset(cols, 0, sizeof(cols));
-                memset(text, 0, sizeof(text));
+                //memset(text, 0, sizeof(text));
                 break;
             }
             if (same_button_counter == 1) { color = RED; }
