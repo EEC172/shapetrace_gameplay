@@ -15,6 +15,7 @@ unsigned char  g_ucConnectionBSSID[BSSID_LEN_MAX]; //Connection BSSID
 signed char    *g_Host = SERVER_NAME;
 SlDateTime g_time;
 
+char actual_string[128];
 char rows[16];
 char cols[16];
 
@@ -696,7 +697,26 @@ int connectToAccessPoint() {
 
 void SetUpForHTTPPost() {
 //    PrintAndClearTextString();
-    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"rows\" : \"%s\", \"cols\" : \"%s\"\r\n}}}\r\n\r\n";
+    //int y = 0;
+    //for (y = 0; y < COLS; y++) {
+    //memset(actual_string, 0, sizeof(actual_string));
+//    int x = 0; int y = 0;
+//    for (x = 0; x < ROWS; x++) {
+//        actual_string[x] = actual[x][y];
+//    }
+//
+    char str_accuracy[7];
+    snprintf(str_accuracy, sizeof(str_accuracy), "%.2f", accuracy_percentage);
+    Report("actual_string: %s\n\r", actual_string);
+
+    char *shape_name = "Shape";
+    if (shape_type == IS_SQUARE) { shape_name = "Square"; }
+    else if (shape_type == IS_TRIANGLE) { shape_name = "Triangle"; }
+    else if (shape_type == IS_CIRCLE) { shape_name = "Circle"; }
+
+    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"accuracy\" : \"%s\", \"shape\" : \"%s\"\r\n}}}\r\n\r\n";
+
+    //char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"rows\" : \"%s\", \"cols\" : \"%s\"\r\n}}}\r\n\r\n";
 
     char rowHexString[33];
     char colHexString[33];
@@ -712,10 +732,11 @@ void SetUpForHTTPPost() {
     rowHexString[32] = '\0';
     colHexString[32] = '\0';
 
-    int total_length = snprintf(NULL, 0, json_template, rowHexString, colHexString) + 1;
+    //int total_length = snprintf(NULL, 0, json_template, rowHexString, colHexString) + 1;
+    int total_length = snprintf(NULL, 0, json_template, str_accuracy, shape_name) + 1;
     char post_string[total_length + 1];
 
-    snprintf(post_string, sizeof(post_string), json_template, rowHexString, colHexString);
+    snprintf(post_string, sizeof(post_string), json_template, str_accuracy, shape_name);
     //Report("AWS String: %s\n\r", aws_string);
     long lRetVal = -1;
 
@@ -741,7 +762,11 @@ void SetUpForHTTPPost() {
     //memset(text, 0, sizeof(text));
     ResetXAndY();
     ResetActualCoordinates();
+        //Report("I FINISHED THE POST\n\r");
     Report("I FINISHED THE POST\n\r");
+    //}
+    ResetXAndY();
+    ResetActualCoordinates();
 }
 
 //*****************************************************************************

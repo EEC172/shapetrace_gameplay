@@ -79,6 +79,7 @@ volatile int state;
 #define MAGENTA         0xF81F
 #define YELLOW          0xFFE0
 #define WHITE           0xFFFF
+#define DARK_BLUE       0x0005
 
 #define HORIZONTAL      0
 #define VERTICAL        1
@@ -105,6 +106,7 @@ volatile int state;
 #define IS_SQUARE 2
 #define IS_TRIANGLE 3
 #define IS_CIRCLE 4
+#define IS_HOUSE 5
 
 #define ROWS 128
 #define COLS 128

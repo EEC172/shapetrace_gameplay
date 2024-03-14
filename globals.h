@@ -83,4 +83,6 @@ extern float accuracy_percentage;
 
 extern int shape_type;
 
+extern char actual_string[128];
+
 #endif // GLOBALS_H

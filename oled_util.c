@@ -71,6 +71,7 @@ void PrintConstantString(const char *fixed_string, int x_prompt, int y_prompt, i
 }
 
 void PrintCoverPage() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     drawChar(10, 64, 'S', YELLOW, YELLOW, 2);
     drawChar(20, 64, 'h', YELLOW, YELLOW, 2);
     drawChar(30, 64, 'a', YELLOW, YELLOW, 2);
@@ -87,6 +88,7 @@ void PrintCoverPage() {
 }
 
 void PrintInstructions() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     const char *orientation_prompt = "Orient CC3200         horizontally and place above OLED.";
     PrintConstantString(orientation_prompt, 0, 0, YELLOW);
     const char *tilt_instruction = "You will trace over a predrawn shape and    get an accuracy score.";
@@ -98,6 +100,7 @@ void PrintInstructions() {
 }
 
 void ShapeOptions() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     const char *square = "SQUARE -> PRESS 2";
     PrintConstantString(square, 0, 20, CYAN);
     const char *triangle = "TRIANGLE -> PRESS 3";
@@ -107,6 +110,7 @@ void ShapeOptions() {
 }
 
 void OtherRules() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     const char *multitap_heading = "MULTITAP (Press 7):";
     PrintConstantString(multitap_heading, 0, 0, CYAN);
     const char *tap1 = "Press 7 1x - Yellow";
@@ -219,6 +223,7 @@ void drawCompass() {
 
 void DrawSquareAndUpdateArray() {
     ResetXAndY();
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     //expected_pixel_count = 0;
     int starting_point = 30;
     int x = starting_point; int y = starting_point;
@@ -235,6 +240,7 @@ void DrawSquareAndUpdateArray() {
 
 void DrawTriangleAndUpdateArray() {
     ResetXAndY();
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     int base = 60; int height = 60; int starting_point = 30;
     int x = starting_point; int y = starting_point;
     for (y = starting_point; y < starting_point + height; y++) {
@@ -250,6 +256,7 @@ void DrawTriangleAndUpdateArray() {
 
 void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
       ResetXAndY();
+      fillRect(0, 0, 128, 128, DARK_BLUE);
       int f = 1 - r;
       int ddF_x = 1;
       int ddF_y = -2 * r;
