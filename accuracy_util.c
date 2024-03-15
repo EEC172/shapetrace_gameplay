@@ -14,11 +14,9 @@ void FindClosestActualPoint(int expectedX, int expectedY, int addOrSubtract) {
         if (actualY < 0 || actualY >= COLS) { continue; }
         for (dx = -4; dx <= 4; dx++) {
             actualX = expectedX + dx;
-            //Report("ActualX: %d\t ActualY: %d\n\r", actualX, actualY);
             if (actualY < 0 || actualY >= COLS) { continue; }
             if (actual[actualX][actualY] == '1') {
                 float error = sqrt(pow(dx, 2) + pow(dy, 2));
-                //Report("error: %3f\n\r", error);
                 if (error < closest) {
                     closest = error;
                 }
@@ -27,10 +25,6 @@ void FindClosestActualPoint(int expectedX, int expectedY, int addOrSubtract) {
     }
     if (addOrSubtract == SUBTRACT) { user_points -= (closest / (float)ERROR_RANGE); }
     else if (addOrSubtract == ADD) { user_points += (1.0 - (closest / (float)ERROR_RANGE)); }
-
-    //Report("increment: %.3f\n\r", closest / (float)ERROR_RANGE);
-    //Report("closest: %.3f\n\r", closest); Report("error range: %.3f\n\r", (float)ERROR_RANGE);
-    //Report("user_points: %.3f\n\r", user_points);
 }
 
 void GenerateAccuracy() {
@@ -59,7 +53,6 @@ void GenerateAccuracy() {
                 } else if (expected[expectedX][expectedY] == '1' &&
                         actual[expectedX][expectedY] == '1') {
                     user_points+=1.0;
-                    //Report("user_points: %.3f\n\r", user_points);
                 }
             }
         }

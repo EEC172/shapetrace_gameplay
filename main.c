@@ -201,8 +201,6 @@ void GameIterator() {
 //!
 //*****************************************************************************
 void main() {
-    //long lRetVal = -1;
-
     unsigned long ulStatus;
     //
     // Initialize board configuration
@@ -254,19 +252,5 @@ void main() {
     while (1) {
         GameIterator();
     }
-
-//    drawCompass();
-    //DrawSquareAndUpdateArray();
-
-//    while (1) {
-//        I2CCode();
-//        while ((IR_intflag==0)) {;}
-//        if ((IR_intflag)) {
-//            IR_intflag=0;  // clear flag
-//            //PrintPressedButton();
-//            SetPressedNumber();
-//            IR_intcount = 0;
-//        }
-//    }
 }
 

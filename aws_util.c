@@ -719,7 +719,6 @@ void SetUpForHTTPPost() {
                     index++;
                 }
             }
-
             // convert the char value at boardHexString[c_index] to its hex number
             if (hex_value < 10) {
                 boardHexString[c_index] = hex_value + '0';
@@ -732,7 +731,7 @@ void SetUpForHTTPPost() {
 
     boardHexString[(ROWS*ROWS)/4] = '\0';
 
-    char str_accuracy[8];
+    char str_accuracy[7];
     snprintf(str_accuracy, sizeof(str_accuracy), "%.2f", accuracy_percentage);
     Report("actual_string: %s\n\r", actual_string);
 
@@ -741,11 +740,14 @@ void SetUpForHTTPPost() {
     else if (shape_type == IS_TRIANGLE) { shape_name = "Triangle"; }
     else if (shape_type == IS_CIRCLE) { shape_name = "Circle"; }
     else if (shape_type == IS_HOUSE) { shape_name = "House"; }
+    Report("shape_name: %s\n\r", shape_name);
 
     char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"board\" : \"%s\",\"shape\" : \"%s\",\"score\" : \"%s\"\r\n}}}\r\n\r\n";
 
     int total_length = snprintf(NULL, 0, json_template, boardHexString, shape_name, str_accuracy) + 1;
     char post_string[total_length + 1];
+
+    post_string[total_length] = '\0';
 
     snprintf(post_string, sizeof(post_string), json_template, boardHexString, shape_name, str_accuracy);
     //Report("AWS String: %s\n\r", aws_string);
@@ -765,15 +767,11 @@ void SetUpForHTTPPost() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal, post_string);
+    memset(boardHexString, 0, sizeof(boardHexString));
+
     Report("I FINISHED THE POST\n\r");
     letter_count = 0;
-    //memset(rows, 0, sizeof(rows));
-    //memset(cols, 0, sizeof(cols));
-    memset(boardHexString, 0, sizeof(boardHexString));
-    //memset(text, 0, sizeof(text));
-    ResetXAndY();
-    ResetActualCoordinates();
-        //Report("I FINISHED THE POST\n\r");
+    Report("Finished Print kjl;kl;jkl;\n\r");
     return;
 }
 
@@ -786,7 +784,7 @@ void SetUpForHTTPPost() {
 
 static int http_post(int iTLSSockID, char *AWSString) {
     char acSendBuff[512];
-    char acRecvbuff[1460];
+    char acRecvbuff[4500];
     char cCLLength[200];
     char* pcBufHeaders;
     int lRetVal = 0;

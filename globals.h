@@ -38,7 +38,6 @@ extern double systick_get_ms[33];
 extern char start_and_address[17];
 extern char data[16];
 extern int letter_count;
-extern char text[64];
 extern int pressed_button;
 extern int prev;
 extern int same_button_counter;
@@ -47,26 +46,9 @@ extern time_t uart_handler_time;
 extern double interval;
 extern int globalX;
 extern int globalY;
-extern char dad[64];
-extern unsigned char ucCharBuffer[64];
-extern uint16_t ui16CharCounter;
 extern int uart_int_count;
 extern int UART_RX_intflag;
-
-//extern unsigned char reg_offset;
-//extern static unsigned long __Errorlog;
-
-typedef struct {
-    /* time */
-    uint8_t coordinateX;
-    uint8_t coordinateY;
-} Coordinate;
-
-extern Coordinate expected_coordinates[MAX_SIZE];
-//extern char expectedX[128];
-//extern char expectedY[128];
 extern int expected_pixel_count;
-extern Coordinate actual_coordinates[5000];
 extern int actual_pixel_count;
 
 extern volatile unsigned char setup_flag;
@@ -83,6 +65,6 @@ extern float accuracy_percentage;
 
 extern int shape_type;
 
-extern char actual_string[128];
+extern unsigned int color;
 
 #endif // GLOBALS_H

@@ -5,6 +5,7 @@
 unsigned char reg_offset = 0x02;
 int actual_pixel_count = 0;
 char actual[ROWS][COLS];
+unsigned int color = YELLOW;
 
 void ResetActualCoordinates() {
     memset(actual, 0, sizeof(actual));
@@ -25,7 +26,7 @@ void I2CCode() {
     memset(actual, '0', sizeof(actual));
 
     int XPosition = globalX; int YPosition = globalY;
-    int radius = 1; unsigned int color = YELLOW;
+    int radius = 1; //unsigned int color = YELLOW;
     fillCircle(XPosition, YPosition, radius, color);
     UpdateActualCoordinates(XPosition, YPosition);
     unsigned char data_buffer[128];
@@ -55,8 +56,6 @@ void I2CCode() {
                 XPosition -= new_X/8;
                 YPosition -= new_Y/8;
             }
-
-
             if (XPosition < 0 + radius) {
                 XPosition = 0 + radius;
             }
@@ -66,23 +65,15 @@ void I2CCode() {
 
             fillCircle(XPosition, YPosition, radius, color);
             UpdateActualCoordinates(XPosition, YPosition);
-            //Report("X: %d\t Y: %d\t count: %d\n\r", XPosition, YPosition, count);
-            //count++;
-//            UpdateActualCoordinates(XPosition, YPosition);
-//            Report("Actual Pixel Count: %d\n\r", actual_pixel_count);
-            //modifyRowsBit(XPosition); modifyColsBit(YPosition);
-
         }
         if (IR_intflag) {
             IR_intflag=0;
-            // sometimes doesn't register the MUTE button, just post anways
             SetPressedNumber(); IR_intcount = 0;
             Report("same_button_counter: %d\n\r", same_button_counter);
             chosen_button = pressed_button;
             if (chosen_button == 11) {
                 fillScreen(BLACK); // replace with ending screen + score
                 GenerateAccuracy();
-                //fillScreen(BLACK);
                 SetUpForHTTPPost();
                 fillScreen(BLACK);
                 same_button_counter = 0;
@@ -92,18 +83,12 @@ void I2CCode() {
                 same_button_counter = 0;
                 memset(actual, 0, sizeof(actual));
                 memset(expected, 0, sizeof(expected));
-                memset(rows, 0, sizeof(rows));
-                memset(cols, 0, sizeof(cols));
-                //memset(text, 0, sizeof(text));
                 break;
             }
             if (same_button_counter == 1) { color = RED; }
             else if (same_button_counter == 2) { color = MAGENTA; }
             else if (same_button_counter == 3) { color = GREEN; }
         }
-
         delay(5);
     }
-
-
 }

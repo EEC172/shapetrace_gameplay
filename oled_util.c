@@ -4,32 +4,15 @@
 
 //Global Declarations
 int globalX = 0; int globalY = 70;
-//char expectedX[128];
-//char expectedY[128];
-//Coordinate expected_coordinates[MAX_SIZE];
 int expected_pixel_count = 0;
 char expected[ROWS][COLS];
 
-//void ResetXAndY();
-//void SetXAndYCoordinate(int, int);
-//void MasterMain();
-//void PrintCoverPage();
-//void printText(int);
-//void updateChar(char, unsigned int, int, int);
-//void DrawSquareAndUpdatePixelArray();
-//void DrawTriangleAndUpdateArray();
-
 void ResetXAndY() {
-//    memset(expectedX, '0', sizeof(expectedX));
-//    memset(expectedY, '0', sizeof(expectedY));
     memset(expected, '0', sizeof(expected));
     expected_pixel_count = 0;
 }
 
 void SetXAndYCoordinate(int x, int y) {
-    //expectedX[x] = '1'; expectedY[y] = '1';
-//    expected_coordinates[expected_pixel_count].coordinateX = x;
-//    expected_coordinates[expected_pixel_count].coordinateY = y;
     expected[x][y] = '1';
     expected_pixel_count++;
 }
@@ -154,75 +137,6 @@ void drawCompass() {
 
 }
 
-//void printText(int type_array) {
-//    int pixelX = 0;
-//    int pixelY = 0;
-//    int i = 0;
-//    // don't let x or y go past 128
-//    if (type_array) {
-//        Report("PRINT FUNC ui16 Char Count: %d\n\r", ui16CharCounter);
-//        Report("FINAL PRINT FUNC Received Text message: %.*s\n\r", ui16CharCounter, ucCharBuffer);
-//
-//        for (i = 0; i < ui16CharCounter; i++) {
-//            drawChar(pixelX, pixelY, ucCharBuffer[i], MAGENTA, MAGENTA, 1);
-//            pixelX += 8;
-//            if (pixelX > 127) {
-//                pixelX = 0;
-//                pixelY += 8;
-//            }
-//        }
-//    } else {
-//        Report("should never run this\n\r");
-//        for (i = 0; i < letter_count; i++) {
-//                drawChar(pixelX, pixelY, dad[i], MAGENTA, MAGENTA, 1);
-//            pixelX += 8;
-//            if (pixelX > 127) {
-//                pixelX = 0;
-//                pixelY += 8;
-//            }
-//        }
-//    }
-//    globalX = 0;
-//    globalY = 70;
-//
-//}
-//
-//void updateChar(char letter, unsigned int color, int draw, int confirmPrint) {
-//    // append letter to board + increment X
-//    fillRect(globalX, globalY-8, 8, 8, BLACK);
-//    if (draw) {
-//        drawChar(globalX, globalY-8, letter, color, color, 1);
-//        if ((same_button_counter == 0) || (pressed_button == 0))
-//            letter_count++;
-//        else {
-//            letter_count = letter_count;
-//        }
-//        dad[letter_count - 1] = letter;
-//        if (confirmPrint){
-//            globalX += 8;
-//            if (globalX > 127) {
-//                globalX = 0;
-//                globalY += 8;
-//            }
-//        }
-//    } else {
-//        int boundX = globalX - 8; int boundY = globalY;
-//        // check if there is a letter to erase
-//        if (!(boundX == 0 && boundY == 128)) {
-//            // erase last letter from above row
-//            if (boundX < 0) {
-//                boundX = 120;
-//                boundY -= 8;
-//            }
-//            fillRect(boundX, boundY-8, 8, 8, BLACK);
-//
-//            globalX = boundX;
-//            globalY = boundY;
-//        }
-//    }
-//    Report("Current message: %.*s\n\r", letter_count, dad);
-//}
-
 void DrawSquareAndUpdateArray() {
     fillRect(0, 0, 128, 128, DARK_BLUE);
     ResetXAndY();
@@ -303,7 +217,6 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
         fillCircle(x0 - y, y0 - x, 1, color);
         SetXAndYCoordinate(x0-y, y0-x);
     }
-    //Report("Current count: %d\n", expected_pixel_count);
 }
 
 void DrawHouseAndUpdateArray() {
