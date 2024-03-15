@@ -104,9 +104,11 @@ void ShapeOptions() {
     const char *square = "SQUARE -> PRESS 2";
     PrintConstantString(square, 0, 20, CYAN);
     const char *triangle = "TRIANGLE -> PRESS 3";
-    PrintConstantString(triangle, 0, 60, CYAN);
+    PrintConstantString(triangle, 0, 50, CYAN);
     const char *circle = "CIRCLE -> PRESS 4";
-    PrintConstantString(circle, 0, 100, CYAN);
+    PrintConstantString(circle, 0, 80, CYAN);
+    const char *house = "HOUSE -> PRESS 5";
+    PrintConstantString(house, 0, 110, CYAN);
 }
 
 void OtherRules() {
@@ -222,6 +224,7 @@ void drawCompass() {
 //}
 
 void DrawSquareAndUpdateArray() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     ResetXAndY();
     fillRect(0, 0, 128, 128, DARK_BLUE);
     //expected_pixel_count = 0;
@@ -239,6 +242,7 @@ void DrawSquareAndUpdateArray() {
 }
 
 void DrawTriangleAndUpdateArray() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
     ResetXAndY();
     fillRect(0, 0, 128, 128, DARK_BLUE);
     int base = 60; int height = 60; int starting_point = 30;
@@ -255,8 +259,8 @@ void DrawTriangleAndUpdateArray() {
 }
 
 void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
-      ResetXAndY();
       fillRect(0, 0, 128, 128, DARK_BLUE);
+      ResetXAndY();
       int f = 1 - r;
       int ddF_x = 1;
       int ddF_y = -2 * r;
@@ -300,4 +304,52 @@ void DrawCircleAndUpdateArray(int x0, int y0, int r, unsigned int color) {
         SetXAndYCoordinate(x0-y, y0-x);
     }
     //Report("Current count: %d\n", expected_pixel_count);
+}
+
+void DrawHouseAndUpdateArray() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
+    ResetXAndY();
+    int starting_point = 40;
+    int x = starting_point; int y = starting_point;
+    int limit = starting_point + 50;
+    for (y = starting_point; y < limit; y++) {
+        for (x = starting_point; x < limit; x++) {
+            if (y == starting_point || y == limit-1 || x == starting_point || x == limit-1) {
+                fillCircle(x, y, 1,CYAN);
+                SetXAndYCoordinate(x, y);
+            }
+        }
+    }
+    int roof_start = 40; int roof_end = 90;
+    int middle = (roof_start + roof_end) / 2;
+    int i;
+    for (i = 1; i <= middle - roof_start; i++) {
+        fillCircle(roof_start+i, roof_start-i, 1,CYAN);
+        SetXAndYCoordinate(roof_start+i, roof_start-i);
+        fillCircle(roof_end-i, roof_start-i, 1,CYAN);
+        SetXAndYCoordinate(roof_end-i, roof_start-i);
+    }
+}
+
+void PrintAccuracy() {
+    fillRect(0, 0, 128, 128, DARK_BLUE);
+    drawChar(10, 50, 'A', CYAN, CYAN, 2);
+    drawChar(22, 50, 'C', CYAN, CYAN, 2);
+    drawChar(34, 50, 'C', CYAN, CYAN, 2);
+    drawChar(46, 50, 'U', CYAN, CYAN, 2);
+    drawChar(58, 50, 'R', CYAN, CYAN, 2);
+    drawChar(70, 50, 'A', CYAN, CYAN, 2);
+    drawChar(82, 50, 'C', CYAN, CYAN, 2);
+    drawChar(94, 50, 'Y', CYAN, CYAN, 2);
+    char str_accuracy[8];
+    int x_prompt = 22; int y_prompt = 75;
+    snprintf(str_accuracy, sizeof(str_accuracy), "%.2f%%", accuracy_percentage);
+    int i;
+    for (i = 0; i < strlen(str_accuracy); i++) {
+        drawChar(x_prompt, y_prompt, str_accuracy[i], 0x07EE, 0x07EE, 2);
+        x_prompt += 12;
+        if (x_prompt > 127) {
+            x_prompt = 0; y_prompt += 12;
+        }
+    }
 }

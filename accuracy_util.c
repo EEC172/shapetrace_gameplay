@@ -30,7 +30,7 @@ void FindClosestActualPoint(int expectedX, int expectedY, int addOrSubtract) {
 
     //Report("increment: %.3f\n\r", closest / (float)ERROR_RANGE);
     //Report("closest: %.3f\n\r", closest); Report("error range: %.3f\n\r", (float)ERROR_RANGE);
-    Report("user_points: %.3f\n\r", user_points);
+    //Report("user_points: %.3f\n\r", user_points);
 }
 
 void GenerateAccuracy() {
@@ -39,7 +39,7 @@ void GenerateAccuracy() {
     Report("Actual pixel count: %d\n\r", actual_pixel_count);
     int expectedX, expectedY;
     float closest = ERROR_RANGE;
-    if (actual_pixel_count > expected_pixel_count) {
+    if (actual_pixel_count >= expected_pixel_count) {
         user_points = max_points;
         for (expectedY = 0; expectedY < COLS; expectedY++) {
             for (expectedX = 0; expectedX < ROWS; expectedX++) {
@@ -59,12 +59,23 @@ void GenerateAccuracy() {
                 } else if (expected[expectedX][expectedY] == '1' &&
                         actual[expectedX][expectedY] == '1') {
                     user_points+=1.0;
-                    Report("user_points: %.3f\n\r", user_points);
+                    //Report("user_points: %.3f\n\r", user_points);
                 }
             }
         }
     }
     accuracy_percentage = (user_points/max_points) * 100.00;
+    if (actual_pixel_count > expected_pixel_count) {
+        accuracy_percentage *= (1-((actual_pixel_count-expected_pixel_count)/expected_pixel_count));
+        //Report("Actual")
+        Report("Expected pixel count: %d\n\r", expected_pixel_count);
+        int target = expected_pixel_count * 2;
+        if (actual_pixel_count >= target) {
+            Report("I am here\n\r");
+            accuracy_percentage = 0.0;
+        }
+    }
     Report("Accuracy is: %.2f\n\r", accuracy_percentage);
+    PrintAccuracy();
     max_points = 0; user_points = 0;
 }

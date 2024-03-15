@@ -705,7 +705,18 @@ void SetUpForHTTPPost() {
 //        actual_string[x] = actual[x][y];
 //    }
 //
-    char str_accuracy[7];
+
+    int size = 4096;
+    char boardHexString[size + 1];
+
+    int i;
+
+    for (i = 0; i < size; i++) {
+        boardHexString[i] = '0';
+    }
+    boardHexString[size] = '\0';
+
+    char str_accuracy[8];
     snprintf(str_accuracy, sizeof(str_accuracy), "%.2f", accuracy_percentage);
     Report("actual_string: %s\n\r", actual_string);
 
@@ -713,8 +724,9 @@ void SetUpForHTTPPost() {
     if (shape_type == IS_SQUARE) { shape_name = "Square"; }
     else if (shape_type == IS_TRIANGLE) { shape_name = "Triangle"; }
     else if (shape_type == IS_CIRCLE) { shape_name = "Circle"; }
+    else if (shape_type == IS_HOUSE) { shape_name = "House"; }
 
-    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"accuracy\" : \"%s\", \"shape\" : \"%s\"\r\n}}}\r\n\r\n";
+    char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"board\" : \"%s\",\"shape\" : \"%s\",\"score\" : \"%s\"\r\n}}}\r\n\r\n";
 
     //char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"rows\" : \"%s\", \"cols\" : \"%s\"\r\n}}}\r\n\r\n";
 
@@ -722,7 +734,7 @@ void SetUpForHTTPPost() {
     char colHexString[33];
 
     int offset = 0;
-    int i;
+    //int i;
 
     for (i = 0; i < 16; i++) {
         sprintf(rowHexString + offset, "%02X", (uint8_t)rows[i]);
@@ -733,10 +745,10 @@ void SetUpForHTTPPost() {
     colHexString[32] = '\0';
 
     //int total_length = snprintf(NULL, 0, json_template, rowHexString, colHexString) + 1;
-    int total_length = snprintf(NULL, 0, json_template, str_accuracy, shape_name) + 1;
+    int total_length = snprintf(NULL, 0, json_template, boardHexString, shape_name, str_accuracy) + 1;
     char post_string[total_length + 1];
 
-    snprintf(post_string, sizeof(post_string), json_template, str_accuracy, shape_name);
+    snprintf(post_string, sizeof(post_string), json_template, boardHexString, shape_name, str_accuracy);
     //Report("AWS String: %s\n\r", aws_string);
     long lRetVal = -1;
 

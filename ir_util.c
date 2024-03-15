@@ -217,7 +217,7 @@ void SetPressedNumber() {
     else if (strcmp(data, ARRAY_2) == 0) { pressed_button = 2; updateButtonPress(); }
     else if (strcmp(data, ARRAY_3) == 0) { pressed_button = 3; updateButtonPress(); }
     else if (strcmp(data, ARRAY_4) == 0) { pressed_button = 4; updateButtonPress(); }
-//    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress(); }
+    else if (strcmp(data, ARRAY_5) == 0) { pressed_button = 5; updateButtonPress(); }
 //    else if (strcmp(data, ARRAY_6) == 0) { pressed_button = 6; updateButtonPress(); }
     else if (strcmp(data, ARRAY_7) == 0) { pressed_button = 7; updateButtonPress(); }
     else if (strcmp(data, ARRAY_8) == 0) { pressed_button = 8; updateButtonPress(); }
@@ -283,6 +283,12 @@ void IRRemoteOptionSetup() {
                 fillScreen(BLACK);
                 globalX = 60; globalY = 30;
                 DrawCircleAndUpdateArray(60, 60, 30, CYAN);
+                chosen_button = 0; break;
+            } else if (chosen_button == IS_HOUSE) {
+                shape_type = IS_HOUSE;
+                fillScreen(BLACK);
+                globalX = 40; globalY = 40;
+                DrawHouseAndUpdateArray();
                 chosen_button = 0; break;
             }
         }
