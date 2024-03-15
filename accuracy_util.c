@@ -64,10 +64,12 @@ void GenerateAccuracy() {
             }
         }
     }
-    accuracy_percentage = (user_points/max_points) * 100.00;
+    accuracy_percentage = (user_points/max_points);
+    Report("Accuracy_percentage before penalty check: %.2f\n\r", accuracy_percentage*100.00);
     if (actual_pixel_count > expected_pixel_count) {
-        accuracy_percentage *= (1-((actual_pixel_count-expected_pixel_count)/expected_pixel_count));
-        //Report("Actual")
+        float penalty = 1.0 - ((float)(actual_pixel_count-expected_pixel_count)/(float)(expected_pixel_count));
+        accuracy_percentage = accuracy_percentage * penalty;
+        Report("penalty: %.2f\n\r", penalty);
         Report("Expected pixel count: %d\n\r", expected_pixel_count);
         int target = expected_pixel_count * 2;
         if (actual_pixel_count >= target) {
@@ -75,6 +77,7 @@ void GenerateAccuracy() {
             accuracy_percentage = 0.0;
         }
     }
+    accuracy_percentage = accuracy_percentage * 100.00;
     Report("Accuracy is: %.2f\n\r", accuracy_percentage);
     PrintAccuracy();
     max_points = 0; user_points = 0;

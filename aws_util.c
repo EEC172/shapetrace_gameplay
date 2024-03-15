@@ -1,3 +1,4 @@
+
 #include "macros.h"
 #include "includes.h"
 #include "globals.h"
@@ -696,25 +697,40 @@ int connectToAccessPoint() {
 }
 
 void SetUpForHTTPPost() {
-//    PrintAndClearTextString();
-    //int y = 0;
-    //for (y = 0; y < COLS; y++) {
-    //memset(actual_string, 0, sizeof(actual_string));
-//    int x = 0; int y = 0;
-//    for (x = 0; x < ROWS; x++) {
-//        actual_string[x] = actual[x][y];
-//    }
-//
+    char boardHexString[(ROWS*ROWS)/4 + 1];
 
-    int size = 4096;
-    char boardHexString[size + 1];
+    int c_index = 0;
+    int r;
+    int c;
+    for (r = 0; r < ROWS; r+=SIZE) {
+        for (c = 0; c < ROWS; c+=SIZE) {
+            int index = 0;
+            int i;
+            int j;
+            char hex_value = 0;
+            for (i = r; i < r+SIZE; i++) {
+                for (j = c; j < c+SIZE; j++) {
+//                    if (actual[i][j] == '1') {
+//                        boardHexString[c_index] |= (1 << ((SIZE * SIZE) - 1 - index));
+//                    } else {
+//                        boardHexString[c_index] |= (0 << ((SIZE * SIZE) - 1 - index));
+//                    }
+                    hex_value |= (actual[i][j] == '1') ? (1 << ((SIZE * SIZE) - 1 - index)) : 0;
+                    index++;
+                }
+            }
 
-    int i;
-
-    for (i = 0; i < size; i++) {
-        boardHexString[i] = '0';
+            // convert the char value at boardHexString[c_index] to its hex number
+            if (hex_value < 10) {
+                boardHexString[c_index] = hex_value + '0';
+            } else {
+                boardHexString[c_index] = hex_value - 10 + 'A';
+            }
+            c_index++;
+        }
     }
-    boardHexString[size] = '\0';
+
+    boardHexString[(ROWS*ROWS)/4] = '\0';
 
     char str_accuracy[8];
     snprintf(str_accuracy, sizeof(str_accuracy), "%.2f", accuracy_percentage);
@@ -728,23 +744,6 @@ void SetUpForHTTPPost() {
 
     char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"board\" : \"%s\",\"shape\" : \"%s\",\"score\" : \"%s\"\r\n}}}\r\n\r\n";
 
-    //char json_template[] = "{\"state\": {\r\n\"desired\" : {\r\n\"rows\" : \"%s\", \"cols\" : \"%s\"\r\n}}}\r\n\r\n";
-
-    char rowHexString[33];
-    char colHexString[33];
-
-    int offset = 0;
-    //int i;
-
-    for (i = 0; i < 16; i++) {
-        sprintf(rowHexString + offset, "%02X", (uint8_t)rows[i]);
-        sprintf(colHexString + offset, "%02X", (uint8_t)cols[i]);
-        offset += 2;
-    }
-    rowHexString[32] = '\0';
-    colHexString[32] = '\0';
-
-    //int total_length = snprintf(NULL, 0, json_template, rowHexString, colHexString) + 1;
     int total_length = snprintf(NULL, 0, json_template, boardHexString, shape_name, str_accuracy) + 1;
     char post_string[total_length + 1];
 
@@ -766,19 +765,16 @@ void SetUpForHTTPPost() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal, post_string);
-    //sl_Stop(SL_STOP_TIMEOUT);
-//    LOOP_FOREVER(); // may be a problem!!
+    Report("I FINISHED THE POST\n\r");
     letter_count = 0;
-    memset(rows, 0, sizeof(rows));
-    memset(cols, 0, sizeof(cols));
+    //memset(rows, 0, sizeof(rows));
+    //memset(cols, 0, sizeof(cols));
+    memset(boardHexString, 0, sizeof(boardHexString));
     //memset(text, 0, sizeof(text));
     ResetXAndY();
     ResetActualCoordinates();
         //Report("I FINISHED THE POST\n\r");
-    Report("I FINISHED THE POST\n\r");
-    //}
-    ResetXAndY();
-    ResetActualCoordinates();
+    return;
 }
 
 //*****************************************************************************
@@ -852,27 +848,4 @@ static int http_post(int iTLSSockID, char *AWSString) {
     }
 
     return 0;
-}
-
-// idk where else to put this but it updates the rows and cols array
-void modifyRowsBit(int x) {
-    int charIndex = x / 8;
-    int bitPos = x % 8;
-    rows[charIndex] |= (1 << bitPos);
-
-//    uint8_t *bytes = (uint8_t *)rows;
-//
-//    // Printing the bytes
-//    printf("Bytes: ");
-//    int i;
-//    for (i = 0; i < 16; i++) {
-//        printf("%02X ", bytes[i]);
-//    }
-//    printf("\n");
-}
-
-void modifyColsBit(int x) {
-    int charIndex = x / 8;
-    int bitPos = x % 8;
-    cols[charIndex] |= (1 << bitPos);
 }

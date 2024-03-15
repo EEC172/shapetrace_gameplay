@@ -71,20 +71,20 @@ void PrintConstantString(const char *fixed_string, int x_prompt, int y_prompt, i
 }
 
 void PrintCoverPage() {
-    fillRect(0, 0, 128, 128, DARK_BLUE);
-    drawChar(10, 64, 'S', YELLOW, YELLOW, 2);
-    drawChar(20, 64, 'h', YELLOW, YELLOW, 2);
-    drawChar(30, 64, 'a', YELLOW, YELLOW, 2);
-    drawChar(40, 64, 'p', YELLOW, YELLOW, 2);
-    drawChar(50, 64, 'e', YELLOW, YELLOW, 2);
-    drawChar(60, 64, 'T', YELLOW, YELLOW, 2);
-    drawChar(70, 64, 'r', YELLOW, YELLOW, 2);
-    drawChar(80, 64, 'a', YELLOW, YELLOW, 2);
-    drawChar(90, 64, 'c', YELLOW, YELLOW, 2);
-    drawChar(100, 64, 'e', YELLOW, YELLOW, 2);
+    fillRect(0, 0, 128, 128, WHITE);
+    drawChar(10, 50, 'S', YELLOW, DARK_BLUE, 2);
+    drawChar(20, 50, 'h', YELLOW, DARK_BLUE, 2);
+    drawChar(30, 50, 'a', YELLOW, DARK_BLUE, 2);
+    drawChar(40, 50, 'p', YELLOW, DARK_BLUE, 2);
+    drawChar(50, 50, 'e', YELLOW, DARK_BLUE, 2);
+    drawChar(60, 50, 'T', YELLOW, DARK_BLUE, 2);
+    drawChar(70, 50, 'r', YELLOW, DARK_BLUE, 2);
+    drawChar(80, 50, 'a', YELLOW, DARK_BLUE, 2);
+    drawChar(90, 50, 'c', YELLOW, DARK_BLUE, 2);
+    drawChar(100, 50, 'e', YELLOW, DARK_BLUE, 2);
 
     const char *init_prompt = "Press 0 on IR to      continue";
-    PrintConstantString(init_prompt, 0, 100, WHITE);
+    PrintConstantString(init_prompt, 0, 100, BLACK);
 }
 
 void PrintInstructions() {

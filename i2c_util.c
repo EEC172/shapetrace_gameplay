@@ -82,7 +82,9 @@ void I2CCode() {
             if (chosen_button == 11) {
                 fillScreen(BLACK); // replace with ending screen + score
                 GenerateAccuracy();
+                //fillScreen(BLACK);
                 SetUpForHTTPPost();
+                fillScreen(BLACK);
                 same_button_counter = 0;
                 break;
             } else if (chosen_button == 10) {
