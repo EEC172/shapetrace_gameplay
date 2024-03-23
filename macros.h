@@ -7,7 +7,6 @@
 
 #define APPLICATION_NAME        "SSL"
 #define APPLICATION_VERSION     "1.1.1.EEC.Spring2018"
-#define SERVER_NAME             "avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com"
 #define GOOGLE_DST_PORT         8443
 
 #define SL_SSL_CA_CERT "/cert/rootCA.der" //starfield class2 rootca (from firefox) // <-- this one works
@@ -16,16 +15,13 @@
 
 
 //NEED TO UPDATE THIS FOR IT TO WORK!
-#define DATE                25    /* Current Date */
-#define MONTH               2     /* Month 1-12 */
+#define DATE                22    /* Current Date */
+#define MONTH               3    /* Month 1-12 */
 #define YEAR                2024  /* Current year */
 #define HOUR                23    /* Time - hours */
 #define MINUTE              06    /* Time - minutes */
 #define SECOND              0     /* Time - seconds */
 
-#define POSTHEADER "POST /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
-#define GETHEADER "GET /things/gb_mr_CC3200/shadow HTTP/1.1\r\n"
-#define HOSTHEADER "Host: avjw5sumnrptc-ats.iot.us-east-1.amazonaws.com\r\n"
 #define CHEADER "Connection: Keep-Alive\r\n"
 #define CTHEADER "Content-Type: application/json; charset=utf-8\r\n"
 #define CLHEADER1 "Content-Length: "

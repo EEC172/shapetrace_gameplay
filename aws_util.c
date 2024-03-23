@@ -767,7 +767,6 @@ void SetUpForHTTPPost() {
         ERR_PRINT(lRetVal);
     }
     http_post(lRetVal, post_string);
-    memset(boardHexString, 0, sizeof(boardHexString));
 
     Report("I FINISHED THE POST\n\r");
     letter_count = 0;
@@ -784,7 +783,7 @@ void SetUpForHTTPPost() {
 
 static int http_post(int iTLSSockID, char *AWSString) {
     char acSendBuff[512];
-    char acRecvbuff[4500];
+    char acRecvbuff[4400];
     char cCLLength[200];
     char* pcBufHeaders;
     int lRetVal = 0;
@@ -844,6 +843,5 @@ static int http_post(int iTLSSockID, char *AWSString) {
         UART_PRINT(acRecvbuff);
         UART_PRINT("\n\r\n\r");
     }
-
     return 0;
 }

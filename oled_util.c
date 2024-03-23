@@ -259,7 +259,7 @@ void PrintAccuracy() {
     snprintf(str_accuracy, sizeof(str_accuracy), "%.2f%%", accuracy_percentage);
     int i;
     for (i = 0; i < strlen(str_accuracy); i++) {
-        drawChar(x_prompt, y_prompt, str_accuracy[i], 0x07EE, 0x07EE, 2);
+        drawChar(x_prompt, y_prompt, str_accuracy[i], 0x67EC, 0x67EC, 2);
         x_prompt += 12;
         if (x_prompt > 127) {
             x_prompt = 0; y_prompt += 12;
